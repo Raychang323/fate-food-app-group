@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".ui.auth.EmailVerificationFragment">
+
+    <TextView
+        android:id="@+id/textView_email_verification_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="輸入 Email 驗證碼"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"/>
+
+    <TextView
+        android:id="@+id/textView_verification_instruction"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="驗證碼已寄送至您的 Email 信箱，\n請查看並於下方輸入。"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@id/textView_email_verification_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textField_verification_code"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="驗證碼 (6位數字)"
+        app:layout_constraintTop_toBottomOf="@id/textView_verification_instruction"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editText_verification_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberPassword"
+            android:maxLength="6"
+            android:letterSpacing="0.2" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/textView_verification_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="gone"
+        tools:text="驗證碼錯誤，請重試。"
+        tools:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/textField_verification_code"
+        app:layout_constraintStart_toStartOf="@id/textField_verification_code"
+        app:layout_constraintEnd_toEndOf="@id/textField_verification_code"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/button_verify_code_submit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="驗證"
+        app:layout_constraintTop_toBottomOf="@id/textView_verification_error"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"/>
+
+    <Button
+        android:id="@+id/button_resend_verification_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="重新寄送驗證碼"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        app:layout_constraintTop_toBottomOf="@id/button_verify_code_submit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

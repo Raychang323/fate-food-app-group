@@ -1,0 +1,186 @@
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/connoisseurCheckFragment">
+
+    <fragment
+        android:id="@+id/connoisseurCheckFragment"
+        android:name="com.fatefulsupper.app.ui.entry.ConnoisseurCheckFragment" 
+        android:label="ConnoisseurCheckFragment"
+        tools:layout="@layout/fragment_connoisseur_check">
+        <action
+            android:id="@+id/action_connoisseurCheckFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_connoisseurCheckFragment_to_lazyModeFragment"
+            app:destination="@id/lazyModeFragment"
+            app:popUpTo="@id/connoisseurCheckFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_connoisseurCheckFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_connoisseurCheckFragment_to_luckyMealFragment"
+            app:destination="@id/luckyMealFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.fatefulsupper.app.ui.auth.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_lazyModeFragment"
+            app:destination="@id/lazyModeFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true"
+            app:popUpToSaveState="false" />
+        <argument
+            android:name="showRegistrationSuccessSnackbar"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.fatefulsupper.app.ui.auth.RegisterFragment"
+        android:label="RegisterFragment"
+        tools:layout="@layout/fragment_register">
+        <action
+            android:id="@+id/action_registerFragment_to_emailVerificationFragment"
+            app:destination="@id/emailVerificationFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/emailVerificationFragment"
+        android:name="com.fatefulsupper.app.ui.auth.EmailVerificationFragment"
+        android:label="EmailVerificationFragment"
+        tools:layout="@layout/fragment_email_verification">
+        <action
+            android:id="@+id/action_emailVerificationFragment_to_lazyModeFragment"
+            app:destination="@id/lazyModeFragment"
+            app:popUpTo="@id/emailVerificationFragment" 
+            app:popUpToInclusive="true"/>
+        <action
+            android:id="@+id/action_email_verified_to_login" 
+            app:destination="@id/loginFragment">
+            <argument
+                android:name="showRegistrationSuccessSnackbar"
+                app:argType="boolean"
+                android:defaultValue="true" />
+             <app:popUpTo
+                android:id="@id/loginFragment"
+                app:popUpToInclusive="true" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/lazyModeFragment"
+        android:name="com.fatefulsupper.app.ui.main.LazyModeFragment"
+        android:label="LazyModeFragment"
+        tools:layout="@layout/fragment_lazy_mode">
+        <action
+            android:id="@+id/action_lazyModeFragment_to_restaurantListFragment"
+            app:destination="@id/restaurantListFragment" />
+        <action
+            android:id="@+id/action_lazyModeFragment_to_rouletteFragment"
+            app:destination="@id/rouletteFragment">
+            <argument
+                android:name="restaurantsForRoulette"
+                app:argType="com.fatefulsupper.app.data.model.Restaurant[]"
+                app:nullable="true"
+                android:defaultValue="@null" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/restaurantListFragment"
+        android:name="com.fatefulsupper.app.ui.recommendation.RestaurantListFragment"
+        android:label="RestaurantListFragment"
+        tools:layout="@layout/fragment_restaurant_list">
+        <action
+            android:id="@+id/action_restaurantListFragment_to_restaurantDetailsFragment"
+            app:destination="@id/restaurantDetailsFragment" />
+        <argument
+            android:name="listFilterType"
+            app:argType="string"
+            android:defaultValue="all" />
+        <argument
+            android:name="likedRestaurantIds"
+            app:argType="string[]"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="aiGeneratedRestaurants"
+            app:argType="com.fatefulsupper.app.data.model.Restaurant[]" 
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/restaurantDetailsFragment"
+        android:name="com.fatefulsupper.app.ui.details.RestaurantDetailsFragment"
+        android:label="RestaurantDetailsFragment"
+        tools:layout="@layout/fragment_restaurant_details">
+        <argument
+            android:name="restaurantId"
+            app:argType="string" />
+        <argument
+            android:name="selectedRestaurantFull"
+            app:argType="com.fatefulsupper.app.data.model.Restaurant"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_restaurantDetailsFragment_to_mapDirectionFragment"
+            app:destination="@id/mapDirectionFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/rouletteFragment"
+        android:name="com.fatefulsupper.app.ui.recommendation.RouletteFragment"
+        android:label="RouletteFragment"
+        tools:layout="@layout/fragment_roulette">
+        <action
+            android:id="@+id/action_rouletteFragment_to_restaurantDetailsFragment"
+            app:destination="@id/restaurantDetailsFragment" />
+        <argument
+            android:name="restaurantsForRoulette" 
+            app:argType="com.fatefulsupper.app.data.model.Restaurant[]"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+    
+    <fragment
+        android:id="@+id/luckyMealFragment"
+        android:name="com.fatefulsupper.app.ui.luckymeal.LuckyMealFragment" 
+        android:label="LuckyMealFragment"
+        tools:layout="@layout/fragment_lucky_meal" >
+        <action
+            android:id="@+id/action_luckyMealFragment_to_connoisseurCheckFragment"
+            app:destination="@id/connoisseurCheckFragment" />
+        <action
+            android:id="@+id/action_lucky_meal_to_map" 
+            app:destination="@id/mapDirectionFragment" /> 
+    </fragment>
+
+    <fragment
+        android:id="@+id/mapDirectionFragment"
+        android:name="com.fatefulsupper.app.ui.map.MapDirectionFragment" 
+        android:label="MapDirectionFragment"
+        tools:layout="@layout/fragment_map_direction">
+        <argument
+            android:name="latitude"
+            app:argType="float" />
+        <argument
+            android:name="longitude"
+            app:argType="float" />
+        <argument
+            android:name="destinationName"
+            app:argType="string" />
+    </fragment>
+
+</navigation>

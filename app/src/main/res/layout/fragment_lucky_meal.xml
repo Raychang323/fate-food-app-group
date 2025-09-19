@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.luckymeal.LuckyMealFragment">
+
+    <TextView
+        android:id="@+id/textView_lucky_meal_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="每日幸運餐 (LuckyMealFragment)"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"/>
+
+    <TextView
+        android:id="@+id/textView_lucky_meal_info_placeholder"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="(顯示本日lucky餐實物照片和資訊 - n29)"
+        android:gravity="center"
+        android:background="#f5f5dc" 
+        app:layout_constraintTop_toBottomOf="@id/textView_lucky_meal_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/button_accept_lucky_meal"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/button_accept_lucky_meal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="接受 (到地圖頁)"
+        app:layout_constraintBottom_toTopOf="@id/button_decline_lucky_meal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="8dp"/>
+
+    <Button
+        android:id="@+id/button_decline_lucky_meal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="不接受 (回饕客選擇頁)"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
