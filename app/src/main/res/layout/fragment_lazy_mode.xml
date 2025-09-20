@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="?attr/colorSurface"
     tools:context=".ui.main.LazyModeFragment">
 
     <com.google.android.material.card.MaterialCardView
@@ -79,14 +79,14 @@
     <LinearLayout
         android:id="@+id/linearLayout_no_more_cards_container"
         android:layout_width="0dp"
-        android:layout_height="wrap_content" 
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
         android:padding="16dp"
-        android:visibility="gone" 
-        tools:visibility="visible" 
+        android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/linearLayout_controls_lazy_mode" 
+        app:layout_constraintBottom_toBottomOf="@id/linearLayout_controls_lazy_mode"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="32dp"
@@ -97,7 +97,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-            android:textColor="@android:color/black"
+            android:textColor="?attr/colorOnSurface"
             android:textAlignment="center"
             android:visibility="visible"
             tools:text="感謝您的選擇！準備好查看為您量身打造的推薦了嗎？" />
@@ -108,18 +108,18 @@
             android:layout_height="wrap_content"
             android:text="查看AI推薦"
             android:layout_marginTop="24dp"
-            android:visibility="visible" 
+            android:visibility="visible"
             tools:visibility="visible"/>
 
         <Button
             android:id="@+id/button_go_to_roulette_from_lazy"
-            style="@style/Widget.MaterialComponents.Button.TextButton" 
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="試試輪盤"
-            android:layout_marginTop="16dp" 
-            android:visibility="visible" 
-            tools:visibility="visible"/> 
+            android:layout_marginTop="16dp"
+            android:visibility="visible"
+            tools:visibility="visible"/>
 
     </LinearLayout>
 
@@ -138,14 +138,14 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="不感興趣" 
+            android:text="不感興趣"
             android:layout_marginEnd="16dp"/>
 
         <Button
             android:id="@+id/button_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="我喜歡" 
+            android:text="我喜歡"
             android:layout_marginStart="16dp"/>
 
     </LinearLayout>
@@ -165,7 +165,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="舊的列表按鈕 (隱藏)"
-            android:visibility="gone" 
+            android:visibility="gone"
             android:layout_marginEnd="8dp"/>
 
     </LinearLayout>

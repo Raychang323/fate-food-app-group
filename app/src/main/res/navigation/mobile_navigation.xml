@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/connoisseurCheckFragment"
-        android:name="com.fatefulsupper.app.ui.entry.ConnoisseurCheckFragment" 
+        android:name="com.fatefulsupper.app.ui.entry.ConnoisseurCheckFragment"
         android:label="ConnoisseurCheckFragment"
         tools:layout="@layout/fragment_connoisseur_check">
         <action
@@ -16,7 +16,7 @@
             android:id="@+id/action_connoisseurCheckFragment_to_lazyModeFragment"
             app:destination="@id/lazyModeFragment"
             app:popUpTo="@id/connoisseurCheckFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" /> <!-- Changed from true to false -->
         <action
             android:id="@+id/action_connoisseurCheckFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
@@ -63,10 +63,10 @@
         <action
             android:id="@+id/action_emailVerificationFragment_to_lazyModeFragment"
             app:destination="@id/lazyModeFragment"
-            app:popUpTo="@id/emailVerificationFragment" 
+            app:popUpTo="@id/emailVerificationFragment"
             app:popUpToInclusive="true"/>
         <action
-            android:id="@+id/action_email_verified_to_login" 
+            android:id="@+id/action_email_verified_to_login"
             app:destination="@id/loginFragment">
             <argument
                 android:name="showRegistrationSuccessSnackbar"
@@ -116,7 +116,7 @@
             android:defaultValue="@null" />
         <argument
             android:name="aiGeneratedRestaurants"
-            app:argType="com.fatefulsupper.app.data.model.Restaurant[]" 
+            app:argType="com.fatefulsupper.app.data.model.Restaurant[]"
             app:nullable="true"
             android:defaultValue="@null" />
     </fragment>
@@ -148,28 +148,28 @@
             android:id="@+id/action_rouletteFragment_to_restaurantDetailsFragment"
             app:destination="@id/restaurantDetailsFragment" />
         <argument
-            android:name="restaurantsForRoulette" 
+            android:name="restaurantsForRoulette"
             app:argType="com.fatefulsupper.app.data.model.Restaurant[]"
             app:nullable="true"
             android:defaultValue="@null" />
     </fragment>
-    
+
     <fragment
         android:id="@+id/luckyMealFragment"
-        android:name="com.fatefulsupper.app.ui.luckymeal.LuckyMealFragment" 
+        android:name="com.fatefulsupper.app.ui.luckymeal.LuckyMealFragment"
         android:label="LuckyMealFragment"
         tools:layout="@layout/fragment_lucky_meal" >
         <action
             android:id="@+id/action_luckyMealFragment_to_connoisseurCheckFragment"
             app:destination="@id/connoisseurCheckFragment" />
         <action
-            android:id="@+id/action_lucky_meal_to_map" 
-            app:destination="@id/mapDirectionFragment" /> 
+            android:id="@+id/action_lucky_meal_to_map"
+            app:destination="@id/mapDirectionFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/mapDirectionFragment"
-        android:name="com.fatefulsupper.app.ui.map.MapDirectionFragment" 
+        android:name="com.fatefulsupper.app.ui.map.MapDirectionFragment"
         android:label="MapDirectionFragment"
         tools:layout="@layout/fragment_map_direction">
         <argument

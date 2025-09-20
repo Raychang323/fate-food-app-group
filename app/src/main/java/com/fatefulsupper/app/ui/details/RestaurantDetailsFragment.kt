@@ -113,19 +113,14 @@ class RestaurantDetailsFragment : Fragment() {
         restaurantCuisineTextView.text = restaurant.cuisine ?: "N/A"
         restaurantDescriptionTextView.text = restaurant.fullDescription ?: restaurant.briefDescription ?: "No description available."
 
-        if (!restaurant.photoUrl.isNullOrEmpty()) {
-            Glide.with(this)
-                .load(restaurant.photoUrl)
-                .placeholder(R.drawable.ic_menu_gallery) // A common default placeholder
-                .error(android.R.drawable.stat_notify_error)   // Using a system error drawable
-                .centerCrop()
-                .into(restaurantImageView)
-        } else {
-            Glide.with(this)
-                .load(android.R.drawable.stat_notify_error) // Using a system error drawable for no image
-                .centerCrop()
-                .into(restaurantImageView)
-        }
+        val imageUrl = restaurant.photoUrl
+
+        Glide.with(this)
+            .load(imageUrl) // Load the actual URL, even if null or empty
+            .placeholder(R.drawable.place_holder)   // Your placeholder image
+            .error(R.drawable.img_loading_error)       // Your error image
+            .centerCrop()
+            .into(restaurantImageView)
 
         if (restaurant.latitude != null && restaurant.longitude != null) {
             getDirectionsButton.setOnClickListener {

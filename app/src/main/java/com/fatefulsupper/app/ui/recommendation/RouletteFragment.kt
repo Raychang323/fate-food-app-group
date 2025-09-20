@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
+// import android.widget.TextView // No longer needed
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -16,15 +16,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.fatefulsupper.app.R
-import com.fatefulsupper.app.data.model.Restaurant // Ensure Restaurant is imported
+import com.fatefulsupper.app.data.model.Restaurant
 
 class RouletteFragment : Fragment() {
 
     private lateinit var viewModel: RouletteViewModel
     private lateinit var spinButton: Button
-    private lateinit var resultTextView: TextView
+    // private var resultTextView: TextView? = null // Removed
+    private lateinit var rouletteWheelView: RouletteWheelView
 
     private val args: RouletteFragmentArgs by navArgs()
+    private var restaurantsFromArgs: List<Restaurant>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,19 +36,24 @@ class RouletteFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(RouletteViewModel::class.java)
 
         spinButton = view.findViewById(R.id.button_spin_roulette)
-        resultTextView = view.findViewById(R.id.textView_selected_roulette_result)
+        // resultTextView = view.findViewById(R.id.textView_selected_roulette_result) // Removed
+        rouletteWheelView = view.findViewById(R.id.roulette_wheel_view)
 
-        val restaurantsFromArgs = args.restaurantsForRoulette?.toList()
+        restaurantsFromArgs = args.restaurantsForRoulette?.toList()
 
-        if (restaurantsFromArgs != null && restaurantsFromArgs.isNotEmpty()) {
-            viewModel.loadRestaurants(restaurantsFromArgs) // ViewModel should handle this list
+        if (restaurantsFromArgs != null && restaurantsFromArgs!!.isNotEmpty()) {
+            viewModel.loadRestaurants(restaurantsFromArgs!!)
+            val restaurantNames = restaurantsFromArgs!!.map { it.name ?: "Unnamed" }
+            rouletteWheelView.setRestaurantList(restaurantNames)
             spinButton.isEnabled = true
-            resultTextView.text = "準備好了嗎？點擊按鈕來旋轉命運輪盤！"
-            resultTextView.isVisible = true
+            // resultTextView?.text = "準備好了嗎？點擊按鈕來旋轉命運輪盤！" // Removed
+            // resultTextView?.isVisible = true // Removed
+            rouletteWheelView.isVisible = true
         } else {
             spinButton.isEnabled = false
-            resultTextView.text = "輪盤沒有可用的餐廳資料。"
-            resultTextView.isVisible = true
+            // resultTextView?.text = "輪盤沒有可用的餐廳資料。" // Removed
+            // resultTextView?.isVisible = true // Removed
+            rouletteWheelView.isVisible = false // Hide wheel if no data
             Log.w("RouletteFragment", "No restaurants passed for roulette.")
             Toast.makeText(context, "輪盤資料為空，請先從 Lazy Mode 產生 AI 推薦。", Toast.LENGTH_LONG).show()
         }
@@ -59,48 +66,54 @@ class RouletteFragment : Fragment() {
 
     private fun setupClickListeners() {
         spinButton.setOnClickListener {
-            if (!spinButton.isEnabled) { 
+            if (!spinButton.isEnabled) {
                 Toast.makeText(context, "輪盤目前無法使用，缺少餐廳資料。", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            resultTextView.text = "旋轉中..."
-            resultTextView.isVisible = true
-            spinButton.isEnabled = false 
-            viewModel.spinAndSelectRestaurant()
+            // resultTextView?.text = "旋轉中..." // Removed
+            Toast.makeText(context, "輪盤旋轉中...", Toast.LENGTH_SHORT).show() // Optional: show a toast instead
+            spinButton.isEnabled = false // Disable button during spin
+            viewModel.pickRestaurantForSpin() // ViewModel will decide which restaurant to spin to
+        }
+
+        rouletteWheelView.onResultListener = { selectedRestaurantName ->
+            // This is called when the RouletteWheelView animation finishes
+            // resultTextView?.text = "選中了： $selectedRestaurantName" // Removed
+            Toast.makeText(context, "選中了： $selectedRestaurantName", Toast.LENGTH_SHORT).show() // Optional: show a toast
+            // Re-enable spin button only if there was valid data initially
+            if (restaurantsFromArgs?.isNotEmpty() == true) {
+                 spinButton.isEnabled = true
+            }
+            viewModel.onSpinAnimationCompleted() // Notify ViewModel that animation is done
         }
     }
 
     private fun observeViewModel() {
-        viewModel.selectedRestaurant.observe(viewLifecycleOwner) { restaurant ->
-            // Only re-enable spin button if there was valid data initially and spin is complete
-            if (args.restaurantsForRoulette?.isNotEmpty() == true) {
-                spinButton.isEnabled = true
-            }
-
-            if (restaurant != null) {
-                resultTextView.text = "選中了： ${restaurant.name}"
-                resultTextView.isVisible = true
-            } else {
-                if (resultTextView.text.toString().contains("旋轉中")) { 
-                     resultTextView.text = "無法選定餐廳，請檢查資料。"
-                } 
-                // If it already said "輪盤沒有可用的餐廳資料。", don't overwrite
+        viewModel.targetRestaurantForSpin.observe(viewLifecycleOwner) { pair ->
+            pair?.let { (index, restaurant) ->
+                Log.d("RouletteFragment", "ViewModel wants to spin to: ${restaurant.name} at index $index")
+                // Only start spinning if the button was clicked (it would be disabled at this point)
+                if (!spinButton.isEnabled) {
+                     rouletteWheelView.spinToTarget(index)
+                }
             }
         }
 
-        // Assuming navigateToDetails LiveData in ViewModel emits the selected Restaurant object
         viewModel.navigateToDetails.observe(viewLifecycleOwner) { restaurant ->
-            restaurant?.let { selectedRestaurant -> // selectedRestaurant is the full Restaurant object
+            restaurant?.let { selectedRestaurant ->
                 Log.d("RouletteFragment", "Navigating to details for: ${selectedRestaurant.name}, ID: ${selectedRestaurant.id}")
-                Handler(Looper.getMainLooper()).postDelayed({
-                    val action = RouletteFragmentDirections.actionRouletteFragmentToRestaurantDetailsFragment(
-                        restaurantId = selectedRestaurant.id, // Pass the ID
-                        selectedRestaurantFull = selectedRestaurant // Pass the full Restaurant object
-                    )
-                    findNavController().navigate(action)
-                    viewModel.onNavigationComplete() 
-                }, 1000) 
+                val action = RouletteFragmentDirections.actionRouletteFragmentToRestaurantDetailsFragment(
+                    restaurantId = selectedRestaurant.id,
+                    selectedRestaurantFull = selectedRestaurant
+                )
+                findNavController().navigate(action)
+                viewModel.onNavigationComplete()
             }
         }
     }
+
+    // override fun onDestroyView() { // No longer needed if resultTextView is fully removed
+    //     super.onDestroyView()
+    //     resultTextView = null 
+    // }
 }

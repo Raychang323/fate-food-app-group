@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="roulette_button_background">#FFD700</color> <!-- Gold -->
+    <color name="roulette_button_text_on_gold">#FF000000</color> <!-- Black for text on gold -->
 </resources>

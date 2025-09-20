@@ -9,38 +9,48 @@ import kotlin.random.Random
 
 class RouletteViewModel : ViewModel() {
 
-    private val _selectedRestaurant = MutableLiveData<Restaurant?>()
-    val selectedRestaurant: LiveData<Restaurant?> = _selectedRestaurant
+    // Pair: First is the index in the list, Second is the Restaurant object itself
+    private val _targetRestaurantForSpin = MutableLiveData<Pair<Int, Restaurant>?>()
+    val targetRestaurantForSpin: LiveData<Pair<Int, Restaurant>?> = _targetRestaurantForSpin
 
     private val _navigateToDetails = MutableLiveData<Restaurant?>()
     val navigateToDetails: LiveData<Restaurant?> = _navigateToDetails
 
-    // This list will be populated by the Fragment from Safe Args
     private var currentRestaurantsForRoulette: List<Restaurant> = emptyList()
+    private var lastSelectedRestaurant: Restaurant? = null
 
-    // Method to be called by the Fragment to set the restaurants
     fun loadRestaurants(newRestaurants: List<Restaurant>) {
         currentRestaurantsForRoulette = newRestaurants
         Log.d("RouletteViewModel", "Loaded ${newRestaurants.size} restaurants for roulette.")
-        // Reset selection if new list is loaded, in case old selection is not in new list
-        _selectedRestaurant.value = null 
+        _targetRestaurantForSpin.value = null // Reset any previous spin target
+        lastSelectedRestaurant = null
     }
 
-    fun spinAndSelectRestaurant() {
+    // Called when the user clicks the spin button
+    fun pickRestaurantForSpin() {
         if (currentRestaurantsForRoulette.isNotEmpty()) {
             val randomIndex = Random.nextInt(currentRestaurantsForRoulette.size)
             val restaurant = currentRestaurantsForRoulette[randomIndex]
-            _selectedRestaurant.value = restaurant
-            _navigateToDetails.value = restaurant
-            Log.d("RouletteViewModel", "Spun and selected: ${restaurant.name}")
+            lastSelectedRestaurant = restaurant // Store for when animation finishes
+            _targetRestaurantForSpin.value = Pair(randomIndex, restaurant)
+            Log.d("RouletteViewModel", "Target for spin: ${restaurant.name} at index $randomIndex")
         } else {
-            _selectedRestaurant.value = null
-            _navigateToDetails.value = null
-            Log.w("RouletteViewModel", "Spin attempted but restaurant list is empty.")
+            _targetRestaurantForSpin.value = null
+            Log.w("RouletteViewModel", "Pick attempted but restaurant list is empty.")
         }
+    }
+
+    // Called by the Fragment when the RouletteWheelView animation is complete
+    fun onSpinAnimationCompleted() {
+        Log.d("RouletteViewModel", "Spin animation completed for ${lastSelectedRestaurant?.name}")
+        _navigateToDetails.value = lastSelectedRestaurant
     }
 
     fun onNavigationComplete() {
         _navigateToDetails.value = null
+        // Optionally, you might want to clear lastSelectedRestaurant here too
+        // lastSelectedRestaurant = null 
+        // Or reset _targetRestaurantForSpin if you want the wheel to be "fresh"
+        // _targetRestaurantForSpin.value = null 
     }
 }
