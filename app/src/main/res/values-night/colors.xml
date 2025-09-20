@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="roulette_button_background">#FFD700</color> <!-- Gold, can be adjusted for dark theme if needed -->
+    <color name="roulette_button_text_on_gold">#FF000000</color> <!-- Black for text on gold -->
+</resources>
