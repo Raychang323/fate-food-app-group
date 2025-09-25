@@ -61,6 +61,7 @@ class RouletteWheelView @JvmOverloads constructor(
     private var isSpinning = false
 
     var onResultListener: ((String) -> Unit)? = null
+    var onItemHoverListener: ((String?) -> Unit)? = null // New listener for hover
 
     fun setRestaurantList(names: List<String>) {
         this.restaurantNames = names
@@ -81,7 +82,7 @@ class RouletteWheelView @JvmOverloads constructor(
 
         // Target segment's middle should align with the top pointer (270 degrees on un-rotated canvas)
         val middleOfTargetSectorAngle = targetIndex * sectorAngle + sectorAngle / 2f
-        var desiredStopAngle = 270f - middleOfTargetSectorAngle 
+        var desiredStopAngle = 270f - middleOfTargetSectorAngle
 
         while (desiredStopAngle < currentRotationAngle) {
             desiredStopAngle += 360f
@@ -95,11 +96,31 @@ class RouletteWheelView @JvmOverloads constructor(
             addUpdateListener {
                 currentRotationAngle = it.animatedValue as Float
                 invalidate()
+
+                // Logic to invoke onItemHoverListener
+                if (restaurantNames.isNotEmpty() && sectorAngle > 0f) {
+                    // Angle on the unrotated wheel that is currently under the top pointer (270 deg)
+                    val angleUnderFixedPointer = (270f - (currentRotationAngle % 360f) + 360f) % 360f
+                    
+                    // Determine which segment this angle falls into.
+                    // Segment i covers angles from i * sectorAngle to (i+1) * sectorAngle.
+                    val hoveredIndex = (angleUnderFixedPointer / sectorAngle).toInt() % restaurantNames.size
+                    
+                    onItemHoverListener?.invoke(restaurantNames[hoveredIndex])
+                } else {
+                    onItemHoverListener?.invoke(null)
+                }
             }
             doOnEnd {
                 isSpinning = false
                 currentRotationAngle = (currentRotationAngle % 360f + 360f) % 360f
                 onResultListener?.invoke(restaurantNames[targetIndex]) // Return original full name
+                // Also call hover listener with the final result
+                if (targetIndex >= 0 && targetIndex < restaurantNames.size) {
+                    onItemHoverListener?.invoke(restaurantNames[targetIndex])
+                } else {
+                    onItemHoverListener?.invoke(null)
+                }
             }
         }
         animator.start()
@@ -113,7 +134,7 @@ class RouletteWheelView @JvmOverloads constructor(
         if (size > 0) {
             textPaint.textSize = (size / 38f).coerceAtMost(28f).coerceAtLeast(14f) // Further adjusted text size
             wheelBorderPaint.strokeWidth = (size / 40f).coerceAtLeast(6f).coerceAtMost(12f)
-            dividerPaint.strokeWidth = (size / 200f).coerceAtLeast(1f) 
+            dividerPaint.strokeWidth = (size / 200f).coerceAtLeast(1f)
         }
     }
 
@@ -145,11 +166,6 @@ class RouletteWheelView @JvmOverloads constructor(
             val currentSegmentPaint = if (i % 2 == 0) segmentPaintLight else segmentPaintDark
             canvas.drawArc(wheelBounds, startAngle, sectorAngle, true, currentSegmentPaint)
             
-            // Draw divider line (REMOVED)
-            // val lineEndX = centerX + radius * cos(Math.toRadians(startAngle.toDouble())).toFloat()
-            // val lineEndY = centerY + radius * sin(Math.toRadians(startAngle.toDouble())).toFloat()
-            // canvas.drawLine(centerX, centerY, lineEndX, lineEndY, dividerPaint)
-
             // Draw text
             canvas.save()
             val textAngle = startAngle + sectorAngle / 2f
@@ -162,9 +178,9 @@ class RouletteWheelView @JvmOverloads constructor(
             val textY = centerY - (textPaint.descent() + textPaint.ascent()) / 2f // Center text vertically
             
             canvas.drawText(displayName.toString(), textX, textY, textPaint)
-            canvas.restore() 
+            canvas.restore()
         }
-        canvas.restore() 
+        canvas.restore()
 
         // Draw wheel border on top of segments
         canvas.drawCircle(centerX, centerY, radius, wheelBorderPaint)
@@ -173,15 +189,13 @@ class RouletteWheelView @JvmOverloads constructor(
         val pointerWidth = (measuredWidth / 18f).coerceAtLeast(25f)
         val pointerHeight = (measuredWidth / 16f).coerceAtLeast(35f)
 
-        // Y-coordinate for the base of the triangle (this will be the flat part, further from the wheel's center)
-        val pointerBaseY = centerY - radius - (wheelBorderPaint.strokeWidth / 2) - pointerHeight - 2f 
-        // Y-coordinate for the tip of the triangle (this will point towards the wheel's center)
+        val pointerBaseY = centerY - radius - (wheelBorderPaint.strokeWidth / 2) - pointerHeight - 2f
         val pointerTipY = centerY - radius - (wheelBorderPaint.strokeWidth / 2) - 2f
 
         val pointerPath = Path().apply {
-            moveTo(centerX - pointerWidth / 2, pointerBaseY) // Top-left of the base
-            lineTo(centerX + pointerWidth / 2, pointerBaseY) // Top-right of the base
-            lineTo(centerX, pointerTipY)                         // Tip of the pointer (pointing towards the wheel)
+            moveTo(centerX - pointerWidth / 2, pointerBaseY)
+            lineTo(centerX + pointerWidth / 2, pointerBaseY)
+            lineTo(centerX, pointerTipY)
             close()
         }
         canvas.drawPath(pointerPath, pointerPaint)

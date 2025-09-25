@@ -51,6 +51,8 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation("com.github.bumptech.glide:glide:5.0.5")
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
 // 如果您在Kotlin專案中使用了Glide的註解處理器 (通常不需要，除非有特定Generated API需求)
 // kapt("com.github.bumptech.glide:compiler:4.16.0")
     testImplementation(libs.junit)

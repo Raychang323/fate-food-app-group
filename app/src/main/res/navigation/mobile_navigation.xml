@@ -134,6 +134,10 @@
             app:argType="com.fatefulsupper.app.data.model.Restaurant"
             app:nullable="true"
             android:defaultValue="@null" />
+        <argument
+            android:name="sourceIsRoulette"
+            app:argType="boolean"
+            android:defaultValue="false" />
         <action
             android:id="@+id/action_restaurantDetailsFragment_to_mapDirectionFragment"
             app:destination="@id/mapDirectionFragment" />

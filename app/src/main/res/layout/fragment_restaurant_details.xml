@@ -93,8 +93,8 @@
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 app:layout_constraintStart_toEndOf="@+id/textView_restaurant_detail_cuisine_label"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/textView_restaurant_detail_cuisine_label"
-                app:layout_constraintBottom_toBottomOf="@+id/textView_restaurant_detail_cuisine_label"
+                app:layout_constraintTop_toTopOf="@id/textView_restaurant_detail_cuisine_label"
+                app:layout_constraintBottom_toBottomOf="@id/textView_restaurant_detail_cuisine_label"
                 tools:text="Japanese, Sushi" />
             
             <TextView
@@ -124,9 +124,23 @@
                 android:layout_height="wrap_content"
                 android:text="規劃路線"
                 android:layout_marginTop="24dp"
-                app:layout_constraintTop_toBottomOf="@+id/textView_restaurant_detail_description"
+                app:layout_constraintTop_toBottomOf="@id/textView_restaurant_detail_description"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
+
+            <!-- New Button Added Here -->
+            <Button
+                android:id="@+id/button_spin_again"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="再玩一次輪盤"
+                android:visibility="gone"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/button_get_directions"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="16dp"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

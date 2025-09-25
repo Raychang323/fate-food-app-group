@@ -35,6 +35,7 @@ class RestaurantDetailsFragment : Fragment() {
     private lateinit var restaurantDescriptionTextView: TextView
     private lateinit var favoriteToggleButton: ImageButton
     private lateinit var getDirectionsButton: Button
+    private lateinit var spinAgainButton: Button // Added this line
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,10 +53,12 @@ class RestaurantDetailsFragment : Fragment() {
         restaurantDescriptionTextView = view.findViewById(R.id.textView_restaurant_detail_description)
         favoriteToggleButton = view.findViewById(R.id.imageButton_favorite_toggle)
         getDirectionsButton = view.findViewById(R.id.button_get_directions)
+        spinAgainButton = view.findViewById(R.id.button_spin_again) // Added this line
 
         setupToolbar()
         observeViewModel()
-        setupClickListeners()
+        setupClickListeners() // Original click listeners
+        // Specific click listener for spinAgainButton will be in onViewCreated based on condition
 
         return view
     }
@@ -72,6 +75,17 @@ class RestaurantDetailsFragment : Fragment() {
             Log.d("RestaurantDetails", "selectedRestaurantFull is null, loading details by ID: ${args.restaurantId}")
             viewModel.loadRestaurantDetails(args.restaurantId)
         }
+
+        // --- Logic for spinAgainButton ---
+        if (args.sourceIsRoulette) {
+            spinAgainButton.visibility = View.VISIBLE
+            spinAgainButton.setOnClickListener {
+                findNavController().popBackStack()
+            }
+        } else {
+            spinAgainButton.visibility = View.GONE
+        }
+        // --- End of logic for spinAgainButton ---
     }
 
     private fun setupToolbar() {
@@ -84,6 +98,7 @@ class RestaurantDetailsFragment : Fragment() {
         favoriteToggleButton.setOnClickListener {
             viewModel.toggleFavoriteStatus()
         }
+        // getDirectionsButton listener is set in updateUiContent based on data
     }
 
     private fun observeViewModel() {
@@ -148,6 +163,14 @@ class RestaurantDetailsFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
+                // Check if we should pop to RouletteFragment or just regular pop
+                // If sourceIsRoulette is true, and we are at RestaurantDetailsFragment,
+                // a normal popBackStack() might go to RouletteFragment if it's the immediate previous.
+                // However, if the user navigated further from details (e.g. to map) and then back,
+                // this simple pop might not be enough or might be too much.
+                // For now, simple popBackStack is fine as per original logic.
+                // If more complex back navigation from "Spin Again" source is needed,
+                // we might need to pop up to a specific destination.
                 findNavController().popBackStack()
                 return true
             }
