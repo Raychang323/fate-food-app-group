@@ -17,6 +17,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true // <-- ADDED THIS LINE
     }
 
     buildTypes {
@@ -26,6 +27,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -50,12 +52,18 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation("com.github.bumptech.glide:glide:5.0.5")
-    implementation(libs.navigation.fragment.ktx)
-    implementation(libs.navigation.ui.ktx)
+    implementation(libs.glide) // Changed to use version catalog
+    implementation(libs.androidx.preference.ktx)
+
 // 如果您在Kotlin專案中使用了Glide的註解處理器 (通常不需要，除非有特定Generated API需求)
 // kapt("com.github.bumptech.glide:compiler:4.16.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+
+android {
+    buildFeatures {
+        buildConfig = true
+    }
 }

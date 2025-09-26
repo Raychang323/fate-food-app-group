@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
+import android.widget.Toast // This import might become unused, which is fine
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -26,7 +26,7 @@ class RouletteFragment : Fragment() {
     private lateinit var textViewCurrentSelection: TextView
 
     private val args: RouletteFragmentArgs by navArgs()
-    private var restaurantsForRouletteLogic: List<Restaurant>? = null // Renamed to avoid confusion with args
+    private var restaurantsForRouletteLogic: List<Restaurant>? = null
     private var isSpinning: Boolean = false
 
     override fun onCreateView(
@@ -43,7 +43,6 @@ class RouletteFragment : Fragment() {
         val rawRestaurantsFromArgs = args.restaurantsForRoulette?.toList()
 
         if (rawRestaurantsFromArgs != null && rawRestaurantsFromArgs.isNotEmpty()) {
-            // Take only the first 10 items if more are available
             val processedRestaurants = if (rawRestaurantsFromArgs.size > 10) {
                 Log.d("RouletteFragment", "Original list size: ${rawRestaurantsFromArgs.size}, taking first 10.")
                 rawRestaurantsFromArgs.take(10)
@@ -52,17 +51,16 @@ class RouletteFragment : Fragment() {
                 rawRestaurantsFromArgs
             }
             
-            this.restaurantsForRouletteLogic = processedRestaurants // Store the processed list for fragment logic
-
-            viewModel.loadRestaurants(processedRestaurants) // ViewModel gets the (at most) 10 items
+            this.restaurantsForRouletteLogic = processedRestaurants
+            viewModel.loadRestaurants(processedRestaurants)
             val restaurantNames = processedRestaurants.map { it.name ?: "Unnamed" }
             
-            rouletteWheelView.setRestaurantList(restaurantNames) // WheelView gets the (at most) 10 names
+            rouletteWheelView.setRestaurantList(restaurantNames)
             spinButton.isEnabled = true
             textViewCurrentSelection.text = "準備好了嗎？"
             rouletteWheelView.isVisible = true
         } else {
-            this.restaurantsForRouletteLogic = emptyList() // Ensure it's not null
+            this.restaurantsForRouletteLogic = emptyList()
             spinButton.isEnabled = false
             textViewCurrentSelection.text = "輪盤資料為空"
             rouletteWheelView.isVisible = false
@@ -84,18 +82,16 @@ class RouletteFragment : Fragment() {
             }
             isSpinning = true
             textViewCurrentSelection.text = "轉動中..."
-            Toast.makeText(context, "輪盤旋轉中...", Toast.LENGTH_SHORT).show()
+            // REMOVED: Toast.makeText(context, "輪盤旋轉中...", Toast.LENGTH_SHORT).show()
             spinButton.isEnabled = false
-            // ViewModel already has the (potentially truncated) list
             viewModel.pickRestaurantForSpin()
         }
 
         rouletteWheelView.onResultListener = { selectedRestaurantName ->
             isSpinning = false
             textViewCurrentSelection.text = "選中了： $selectedRestaurantName"
-            Toast.makeText(context, "選中了： $selectedRestaurantName", Toast.LENGTH_SHORT).show()
-            // Use the stored restaurantsForRouletteLogic which is already processed
-            if (restaurantsForRouletteLogic?.isNotEmpty() == true) { // Check the processed list
+            // REMOVED: Toast.makeText(context, "選中了： $selectedRestaurantName", Toast.LENGTH_SHORT).show()
+            if (restaurantsForRouletteLogic?.isNotEmpty() == true) {
                  spinButton.isEnabled = true
             }
             viewModel.onSpinAnimationCompleted()
@@ -116,13 +112,10 @@ class RouletteFragment : Fragment() {
         viewModel.targetRestaurantForSpin.observe(viewLifecycleOwner) { pair ->
             pair?.let { (index, restaurant) ->
                 Log.d("RouletteFragment", "ViewModel wants to spin to: ${restaurant.name} at index $index")
-                // Ensure the index is valid for the potentially truncated list in RouletteWheelView
                 if (isSpinning && !spinButton.isEnabled && index < (restaurantsForRouletteLogic?.size ?: 0)) {
                      rouletteWheelView.spinToTarget(index)
                 } else if (isSpinning && !spinButton.isEnabled) {
                     Log.e("RouletteFragment", "ViewModel target index $index is out of bounds for wheel items ${restaurantsForRouletteLogic?.size ?: 0}.")
-                    // Handle error: Maybe pick a default or show an error message.
-                    // For now, let's re-enable the button and show a toast.
                     isSpinning = false
                     spinButton.isEnabled = true
                     textViewCurrentSelection.text = "出現錯誤，請重試"
@@ -133,14 +126,12 @@ class RouletteFragment : Fragment() {
 
         viewModel.navigateToDetails.observe(viewLifecycleOwner) { restaurant ->
             restaurant?.let { selectedRestaurant ->
-                // Ensure the selected restaurant is from the (potentially truncated) list used by the UI
                 val actualSelectedRestaurant = restaurantsForRouletteLogic?.find { it.id == selectedRestaurant.id } ?: selectedRestaurant
-
                 Log.d("RouletteFragment", "Navigating to details for: ${actualSelectedRestaurant.name}, ID: ${actualSelectedRestaurant.id}")
                 val action = RouletteFragmentDirections.actionRouletteFragmentToRestaurantDetailsFragment(
                     restaurantId = actualSelectedRestaurant.id,
                     selectedRestaurantFull = actualSelectedRestaurant,
-                    sourceIsRoulette = true // Added this line
+                    sourceIsRoulette = true
                 )
                 findNavController().navigate(action)
                 viewModel.onNavigationComplete()

@@ -10,4 +10,18 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+
+    <!-- Added button strings -->
+    <string name="button_save">儲存</string>
+    <string name="button_cancel">取消</string>
+    <string name="button_next">下一步</string>
+    <string name="button_skip">略過</string>
+    <string name="button_save_and_finish">儲存並完成</string>
+    <string name="button_skip_step">略過此步驟</string>
+
+    <string name="user_greeting">歡迎, %1$s</string>
+    <string name="notification_permission_denied_message">您已拒絕通知權限，將無法收到宵夜推薦通知。</string>
+    <string name="notification_permission_rationale">請允許通知權限以接收每日宵夜推薦。</string>
+    <string name="test_notification_scheduled_message">Test notification (15s) scheduled! (Debug only)</string>
+
 </resources>

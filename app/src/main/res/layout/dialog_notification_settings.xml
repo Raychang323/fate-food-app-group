@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="設定每日幸運餐通知"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="選擇通知星期："
+        android:layout_marginBottom="8dp"/>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:orientation="horizontal">
+
+        <CheckBox android:id="@+id/checkbox_monday" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="星期一"/>
+        <CheckBox android:id="@+id/checkbox_tuesday" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="星期二"/>
+        <CheckBox android:id="@+id/checkbox_wednesday" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="星期三"/>
+        <CheckBox android:id="@+id/checkbox_thursday" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="星期四"/>
+        <CheckBox android:id="@+id/checkbox_friday" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="星期五"/>
+        <CheckBox android:id="@+id/checkbox_saturday" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="星期六"/>
+        <CheckBox android:id="@+id/checkbox_sunday" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="星期日"/>
+    </GridLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="選擇通知時間："
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"/>
+
+    <TimePicker
+        android:id="@+id/time_picker_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:timePickerMode="spinner" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/button_skip_notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="略過"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/button_next_notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="下一步"
+            style="?android:attr/buttonBarButtonStyle"/>
+    </LinearLayout>
+
+</LinearLayout>

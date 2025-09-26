@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -21,35 +22,40 @@ class CustomQuadrantView @JvmOverloads constructor(
     private var listener: OnQuadrantSelectedListener? = null
 
     private val axisPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.DKGRAY // Changed to DKGRAY for softer axes
-        strokeWidth = 4f    // Slightly thicker axes
+        color = Color.DKGRAY
+        strokeWidth = 4f
+        strokeCap = Paint.Cap.ROUND
     }
 
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.LTGRAY
-        strokeWidth = 2f // Slightly thicker grid lines
+        strokeWidth = 2f
+        // For grid lines, Butt cap is often preferred to avoid overdraw at intersections
+        strokeCap = Paint.Cap.BUTT
     }
 
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.BLACK
-        textSize = 32f // Slightly larger text for labels
+        textSize = 32f
         textAlign = Paint.Align.CENTER
     }
 
     private val selectedPointPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#FF6200EE") // Theme accent color (example)
+        color = Color.parseColor("#FF6200EE")
         style = Paint.Style.FILL
     }
 
     private val centerPointPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.GRAY // Softer color for the default (0,0) point
+        color = Color.GRAY
         style = Paint.Style.FILL
     }
 
     private var viewWidth = 0f
     private var viewHeight = 0f
-    private var centerX = 0f
-    private var centerY = 0f
+
+    // These represent the center of the touchable padded area, used for touch-to-logic conversion
+    private var paddedCenterX = 0f
+    private var paddedCenterY = 0f
 
     private var selectedLogicX: Float? = null
     private var selectedLogicY: Float? = null
@@ -59,13 +65,17 @@ class CustomQuadrantView @JvmOverloads constructor(
 
     private val L_MIN = -5.0f
     private val L_MAX = 5.0f
-    private val POINT_RADIUS = 15f // Slightly larger point
-    private val AXIS_LABEL_PADDING = 50f // Increased padding for axis labels
-    private val GRID_INTERVAL = 1.0f // Draw a grid line for every 1.0 unit
+    private val POINT_RADIUS = 15f
+    private val GRID_INTERVAL = 1.0f
+    private val LABEL_OUTER_MARGIN = 20f
 
-    init {
-        // Consider adding custom attributes parsing here if needed
-    }
+    // RectF for the actual drawing area of the quadrant (grid and axes)
+    // This area is inset from the padding by half the widest stroke width used for grid/axes
+    private val contentAreaRect = RectF()
+    private var contentCenterX = 0f
+    private var contentCenterY = 0f
+
+    init {}
 
     fun setOnQuadrantSelectedListener(listener: OnQuadrantSelectedListener?) {
         this.listener = listener
@@ -89,11 +99,35 @@ class CustomQuadrantView @JvmOverloads constructor(
         invalidate()
     }
 
+    fun setAxisColor(color: Int) {
+        axisPaint.color = color
+        invalidate()
+    }
+
+    fun setGridColor(color: Int) {
+        gridPaint.color = color
+        invalidate()
+    }
+
+    fun setTextColor(color: Int) {
+        textPaint.color = color
+        invalidate()
+    }
+
+    fun setSelectedPointColor(color: Int) {
+        selectedPointPaint.color = color
+        invalidate()
+    }
+
+    fun setCenterPointColor(color: Int) {
+        centerPointPaint.color = color
+        invalidate()
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec)
-        // Ensure it's a square, using the smaller dimension if they differ
         val size = min(width, height)
         setMeasuredDimension(size, size)
     }
@@ -102,63 +136,100 @@ class CustomQuadrantView @JvmOverloads constructor(
         super.onSizeChanged(w, h, oldw, oldh)
         viewWidth = w.toFloat()
         viewHeight = h.toFloat()
-        // Calculate center considering padding
-        centerX = paddingLeft + (w - paddingLeft - paddingRight) / 2f
-        centerY = paddingTop + (h - paddingTop - paddingBottom) / 2f
+
+        // Center of the padded area (for touch and logic mapping)
+        paddedCenterX = paddingLeft + (w - paddingLeft - paddingRight) / 2f
+        paddedCenterY = paddingTop + (h - paddingTop - paddingBottom) / 2f
+
+        // Calculate the actual content drawing area, inset from padding
+        // to prevent clipping of lines due to stroke width.
+        // Use the maximum of axis and grid stroke widths for inset calculation.
+        val maxStrokeWidth = max(axisPaint.strokeWidth, gridPaint.strokeWidth)
+        val inset = maxStrokeWidth / 2f
+
+        contentAreaRect.set(
+            paddingLeft + inset,
+            paddingTop + inset,
+            w - paddingRight - inset,
+            h - paddingBottom - inset
+        )
+
+        contentCenterX = contentAreaRect.centerX()
+        contentCenterY = contentAreaRect.centerY()
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val drawAreaWidth = viewWidth - paddingLeft - paddingRight
-        val drawAreaHeight = viewHeight - paddingTop - paddingBottom
+        if (contentAreaRect.width() <= 0 || contentAreaRect.height() <= 0) return
 
-        if (drawAreaWidth <= 0 || drawAreaHeight <= 0) return // Nothing to draw
+        val numberOfIntervals = ((L_MAX - L_MIN) / GRID_INTERVAL).toInt()
+        val stepX = contentAreaRect.width() / numberOfIntervals
+        val stepY = contentAreaRect.height() / numberOfIntervals
 
         // Draw Grid Lines
-        val stepX = drawAreaWidth / (L_MAX - L_MIN) * GRID_INTERVAL
-        val stepY = drawAreaHeight / (L_MAX - L_MIN) * GRID_INTERVAL
-
-        var currentGridX = centerX - ( (0-L_MIN) / GRID_INTERVAL) * stepX // Start from -5 line
-        while(currentGridX <= centerX + ( (L_MAX-0) / GRID_INTERVAL) * stepX + stepX/2) { // ensure 5 line is drawn
-            if(currentGridX >= paddingLeft && currentGridX <= viewWidth - paddingRight) {
-                canvas.drawLine(currentGridX, paddingTop.toFloat(), currentGridX, viewHeight - paddingBottom.toFloat(), gridPaint)
-            }
-            currentGridX += stepX
-        }
-        var currentGridY = centerY - ( (0-L_MIN) / GRID_INTERVAL) * stepY
-        while(currentGridY <= centerY + ( (L_MAX-0) / GRID_INTERVAL) * stepY + stepY/2) {
-            if(currentGridY >= paddingTop && currentGridY <= viewHeight - paddingBottom) {
-                canvas.drawLine(paddingLeft.toFloat(), currentGridY, viewWidth - paddingRight.toFloat(), currentGridY, gridPaint)
-            }
-            currentGridY += stepY
+        for (i in 0..numberOfIntervals) {
+            val x = contentAreaRect.left + i * stepX
+            canvas.drawLine(x, contentAreaRect.top, x, contentAreaRect.bottom, gridPaint)
+            val y = contentAreaRect.top + i * stepY
+            canvas.drawLine(contentAreaRect.left, y, contentAreaRect.right, y, gridPaint)
         }
 
+        // Draw X and Y Axes (centered within contentAreaRect based on L_MIN, L_MAX)
+        // Find the pixel position of logical zero for X and Y axes
+        val zeroLogicRatioX = -L_MIN / (L_MAX - L_MIN)
+        val zeroLogicRatioY = -L_MIN / (L_MAX - L_MIN) // For Y, it's often inverted in display, but logic is same
 
-        // Draw X and Y Axes (on top of grid)
-        canvas.drawLine(paddingLeft.toFloat(), centerY, viewWidth - paddingRight.toFloat(), centerY, axisPaint) // X-axis
-        canvas.drawLine(centerX, paddingTop.toFloat(), centerX, viewHeight - paddingBottom.toFloat(), axisPaint) // Y-axis
+        val axisXPosition = contentAreaRect.left + zeroLogicRatioX * contentAreaRect.width()
+        val axisYPosition = contentAreaRect.top + zeroLogicRatioY * contentAreaRect.height() // This is logical 0,0 y-coord from top
+        // For drawing, Y axis is traditionally from top to bottom, so logical Y=0 will be at axisYPosition
+        // and X axis is logical X=0 will be at axisXPosition.
 
-        // Draw Labels for Axes
+        canvas.drawLine(contentAreaRect.left, axisYPosition, contentAreaRect.right, axisYPosition, axisPaint) // X-axis (at logical Y=0)
+        canvas.drawLine(axisXPosition, contentAreaRect.top, axisXPosition, contentAreaRect.bottom, axisPaint) // Y-axis (at logical X=0)
+
+
+        // --- Draw Labels outside the quadrant box (relative to overall view and padding) ---
         textPaint.textSize = 32f
-        canvas.drawText("開心 (Happy)", centerX, paddingTop + AXIS_LABEL_PADDING, textPaint) // Top
-        canvas.drawText("不開心 (Unhappy)", centerX, viewHeight - paddingBottom - AXIS_LABEL_PADDING / 2, textPaint) // Bottom
+        val textMetrics = textPaint.fontMetrics
 
-        textPaint.textAlign = Paint.Align.LEFT
-        canvas.drawText("不餓 (Not Hungry)", paddingLeft + AXIS_LABEL_PADDING / 3, centerY + textPaint.textSize / 3, textPaint) // Left
-        textPaint.textAlign = Paint.Align.RIGHT
-        canvas.drawText("飢餓 (Hungry)", viewWidth - paddingRight - AXIS_LABEL_PADDING / 3, centerY + textPaint.textSize / 3, textPaint) // Right
-        textPaint.textAlign = Paint.Align.CENTER // Reset
+        textPaint.textAlign = Paint.Align.CENTER
+        val topLabelY = paddingTop - LABEL_OUTER_MARGIN - textMetrics.descent
+        canvas.drawText("開心 (Happy)", viewWidth / 2f, topLabelY, textPaint)
+
+        val bottomLabelY = viewHeight - paddingBottom + LABEL_OUTER_MARGIN - textMetrics.ascent
+        canvas.drawText("不開心 (Unhappy)", viewWidth / 2f, bottomLabelY, textPaint)
+
+        textPaint.textAlign = Paint.Align.CENTER
+        val leftLabelText = "不餓 (Not Hungry)"
+        canvas.save()
+        val rotateXLeft = paddingLeft - LABEL_OUTER_MARGIN - (textMetrics.descent - textMetrics.ascent) / 2f
+        canvas.rotate(-90f, rotateXLeft, viewHeight / 2f)
+        canvas.drawText(leftLabelText, rotateXLeft, viewHeight / 2f - (textMetrics.descent + textMetrics.ascent) / 2f, textPaint)
+        canvas.restore()
+
+        val rightLabelText = "飢餓 (Hungry)"
+        canvas.save()
+        val rotateXRight = viewWidth - paddingRight + LABEL_OUTER_MARGIN + (textMetrics.descent - textMetrics.ascent) / 2f
+        canvas.rotate(90f, rotateXRight, viewHeight / 2f)
+        canvas.drawText(rightLabelText, rotateXRight, viewHeight / 2f - (textMetrics.descent + textMetrics.ascent) / 2f, textPaint)
+        canvas.restore()
+
+        textPaint.textAlign = Paint.Align.CENTER
 
         // Determine point to draw
-        val currentX = selectedLogicX ?: defaultLogicX
-        val currentY = selectedLogicY ?: defaultLogicY
+        val currentLogicX = selectedLogicX ?: defaultLogicX
+        val currentLogicY = selectedLogicY ?: defaultLogicY
         val paintToUse = if (selectedLogicX != null || selectedLogicY != null) selectedPointPaint else centerPointPaint
 
+        // Convert logic to pixel for drawing the point (within contentAreaRect)
+        // Ratio of current logic point within the L_MIN to L_MAX range
+        val xRatio = (currentLogicX - L_MIN) / (L_MAX - L_MIN)
+        val yRatio = (currentLogicY - L_MIN) / (L_MAX - L_MIN) // yRatio is from bottom-up logic
 
-        // Convert logic to pixel for drawing the point
-        val pixelSelectedX = centerX + (currentX / L_MAX) * (drawAreaWidth / 2f)
-        val pixelSelectedY = centerY - (currentY / L_MAX) * (drawAreaHeight / 2f) // Y is inverted
+        // Pixel position within contentAreaRect. Y is inverted for canvas drawing (top-down)
+        val pixelSelectedX = contentAreaRect.left + xRatio * contentAreaRect.width()
+        val pixelSelectedY = contentAreaRect.bottom - yRatio * contentAreaRect.height()
 
         canvas.drawCircle(pixelSelectedX, pixelSelectedY, POINT_RADIUS, paintToUse)
     }
@@ -167,8 +238,14 @@ class CustomQuadrantView @JvmOverloads constructor(
         if (!isEnabled) {
             return false
         }
-        val touchX = event.x.coerceIn(paddingLeft.toFloat(), viewWidth - paddingRight.toFloat())
-        val touchY = event.y.coerceIn(paddingTop.toFloat(), viewHeight - paddingBottom.toFloat())
+        // Touch events are still relative to the padded area, not the inset contentAreaRect
+        val effectivePaddingLeft = paddingLeft.toFloat()
+        val effectivePaddingTop = paddingTop.toFloat()
+        val effectiveDrawableWidth = viewWidth - paddingLeft - paddingRight
+        val effectiveDrawableHeight = viewHeight - paddingTop - paddingBottom
+
+        val touchX = event.x.coerceIn(effectivePaddingLeft, effectivePaddingLeft + effectiveDrawableWidth)
+        val touchY = event.y.coerceIn(effectivePaddingTop, effectivePaddingTop + effectiveDrawableHeight)
 
         when (event.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
@@ -176,8 +253,8 @@ class CustomQuadrantView @JvmOverloads constructor(
                 return true
             }
             MotionEvent.ACTION_UP -> {
-                updateSelectedPointFromTouch(touchX, touchY) // Final update
-                if (selectedLogicX != null && selectedLogicY != null) { // Ensure a point is selected
+                updateSelectedPointFromTouch(touchX, touchY)
+                if (selectedLogicX != null && selectedLogicY != null) {
                     listener?.onQuadrantSelected(selectedLogicX!!, selectedLogicY!!)
                 }
                 performClick()
@@ -189,18 +266,20 @@ class CustomQuadrantView @JvmOverloads constructor(
 
     override fun performClick(): Boolean {
         super.performClick()
-        // Can be used by accessibility services
         return true
     }
 
     private fun updateSelectedPointFromTouch(touchX: Float, touchY: Float) {
-        val drawAreaWidth = viewWidth - paddingLeft - paddingRight
-        val drawAreaHeight = viewHeight - paddingTop - paddingBottom
+        // Logic calculation uses the padded area dimensions and center
+        val paddedAreaWidth = viewWidth - paddingLeft - paddingRight
+        val paddedAreaHeight = viewHeight - paddingTop - paddingBottom
 
-        if (drawAreaWidth <= 0 || drawAreaHeight <= 0) return
+        if (paddedAreaWidth <= 0 || paddedAreaHeight <= 0) return
 
-        var logicX = (touchX - centerX) / (drawAreaWidth / 2f) * L_MAX
-        var logicY = -(touchY - centerY) / (drawAreaHeight / 2f) * L_MAX
+        // Calculate logicX/Y based on the center of the padded area (paddedCenterX, paddedCenterY)
+        // (touchX - paddedCenterX) gives distance from center. Divide by half-width for ratio.
+        var logicX = (touchX - paddedCenterX) / (paddedAreaWidth / 2f) * L_MAX
+        var logicY = -(touchY - paddedCenterY) / (paddedAreaHeight / 2f) * L_MAX // Y is inverted
 
         logicX = clampLogicCoordinate(logicX)
         logicY = clampLogicCoordinate(logicY)

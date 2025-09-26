@@ -13,4 +13,9 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <!-- Added missing styles -->
+    <style name="Theme.Fatefulsupper.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.Fatefulsupper.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

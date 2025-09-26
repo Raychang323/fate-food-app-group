@@ -79,8 +79,9 @@
     <!-- START: Added CustomQuadrantView and optional Submit Button -->
     <com.fatefulsupper.app.ui.custom.CustomQuadrantView
         android:id="@+id/quadrant_view_mood_hunger"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="40dp"
         android:layout_marginTop="16dp"
         android:visibility="gone"
         tools:visibility="visible"

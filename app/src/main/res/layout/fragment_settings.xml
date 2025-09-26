@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.settings.SettingsFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:id="@+id/textView_settings_title_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="應用程式設定"
+            android:textAppearance="?attr/textAppearanceHeadline5"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp"/>
+
+        <!-- Notification Time Setting -->
+        <RelativeLayout
+            android:id="@+id/setting_notification_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
+
+            <TextView
+                android:id="@+id/textView_notification_time_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="每日通知時間"
+                android:textAppearance="?attr/textAppearanceSubtitle1"/>
+
+            <TextView
+                android:id="@+id/textView_notification_time_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textView_notification_time_title"
+                android:text="設定接收宵夜推薦通知的時間"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="?android:attr/textColorSecondary"/>
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
+
+        <!-- Supper Type Blacklist Setting -->
+        <RelativeLayout
+            android:id="@+id/setting_supper_blacklist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
+
+            <TextView
+                android:id="@+id/textView_supper_blacklist_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="宵夜類型黑名單"
+                android:textAppearance="?attr/textAppearanceSubtitle1"/>
+
+            <TextView
+                android:id="@+id/textView_supper_blacklist_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textView_supper_blacklist_title"
+                android:text="管理不想看到的宵夜類型"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="?android:attr/textColorSecondary"/>
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
+
+        <!-- Add other settings here if needed -->
+
+    </LinearLayout>
+</ScrollView>
