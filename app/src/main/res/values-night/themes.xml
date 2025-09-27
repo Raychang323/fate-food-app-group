@@ -11,8 +11,6 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
-    </style>
 
     <!-- Added missing styles -->
     <style name="Theme.Fatefulsupper.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

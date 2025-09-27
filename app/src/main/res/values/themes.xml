@@ -12,6 +12,9 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+    <style name="Base.Theme.Shop" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
     <style name="Theme.FatefulSupper.NoActionBar">
@@ -22,4 +25,5 @@
     <style name="Theme.FatefulSupper.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.FatefulSupper.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.Shop" parent="Base.Theme.Shop" />
 </resources>
