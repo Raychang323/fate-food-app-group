@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,140 +10,95 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_details"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:layout_height="250dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+    android:fitsSystemWindows="true">
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/collapsing_toolbar_details"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleMarginEnd="64dp"
-            app:expandedTitleMarginStart="48dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
-
-            <ImageView
-                android:id="@+id/imageView_restaurant_detail_photo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fitsSystemWindows="true"
-                android:scaleType="centerCrop"
-                tools:srcCompat="@tools:sample/backgrounds/scenic"
-                app:layout_collapseMode="parallax" />
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar_details"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
+    <com.google.android.material.appbar.CollapsingToolbarLayout
+        android:id="@+id/collapsing_toolbar_details"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+        app:contentScrim="@android:color/transparent"
+        app:statusBarScrim="@android:color/transparent"
+        android:fitsSystemWindows="true"
+        app:titleEnabled="false">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <ImageView
+            android:id="@+id/imageView_restaurant_detail_photo"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:fitsSystemWindows="true"
+            app:layout_collapseMode="parallax"
+            tools:src="@drawable/place_holder"/>
 
-            <TextView
-                android:id="@+id/textView_restaurant_detail_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageButton_favorite_toggle"
-                android:layout_marginEnd="8dp"
-                tools:text="Awesome Restaurant Name" />
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-            <ImageButton
-                android:id="@+id/imageButton_favorite_toggle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="8dp"
-                app:srcCompat="@android:drawable/btn_star_big_off" 
-                app:layout_constraintTop_toTopOf="@id/textView_restaurant_detail_name"
-                app:layout_constraintBottom_toBottomOf="@id/textView_restaurant_detail_name"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:contentDescription="Toggle Favorite" />
+</com.google.android.material.appbar.AppBarLayout>
 
-            <TextView
-                android:id="@+id/textView_restaurant_detail_cuisine_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="菜系:"
-                android:layout_marginTop="12dp"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-                app:layout_constraintTop_toBottomOf="@id/textView_restaurant_detail_name"
-                app:layout_constraintStart_toStartOf="parent" />
+<androidx.core.widget.NestedScrollView
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <TextView
-                android:id="@+id/textView_restaurant_detail_cuisine"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                app:layout_constraintStart_toEndOf="@+id/textView_restaurant_detail_cuisine_label"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/textView_restaurant_detail_cuisine_label"
-                app:layout_constraintBottom_toBottomOf="@id/textView_restaurant_detail_cuisine_label"
-                tools:text="Japanese, Sushi" />
-            
-            <TextView
-                android:id="@+id/textView_restaurant_detail_description_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="簡介:"
-                android:layout_marginTop="8dp"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-                app:layout_constraintTop_toBottomOf="@id/textView_restaurant_detail_cuisine_label"
-                app:layout_constraintStart_toStartOf="parent"/>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-            <TextView
-                android:id="@+id/textView_restaurant_detail_description"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                app:layout_constraintTop_toBottomOf="@id/textView_restaurant_detail_description_label"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:text="A very long and detailed description of the restaurant, its ambiance, its special dishes, and why everyone should visit it at least once in their lifetime. This text can wrap multiple lines." />
+    <TextView
+        android:id="@+id/textView_restaurant_detail_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+        tools:text="Restaurant Name"/>
 
-            <Button
-                android:id="@+id/button_get_directions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="規劃路線"
-                android:layout_marginTop="24dp"
-                app:layout_constraintTop_toBottomOf="@id/textView_restaurant_detail_description"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/textView_restaurant_detail_cuisine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        tools:text="Cuisine Type"/>
 
-            <!-- New Button Added Here -->
-            <Button
-                android:id="@+id/button_spin_again"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="再玩一次輪盤"
-                android:visibility="gone"
-                android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@id/button_get_directions"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginBottom="16dp"/>
+    <TextView
+        android:id="@+id/textView_restaurant_detail_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+        tools:text="This is a long description of the restaurant to test the scrolling behavior and make sure everything looks good."/>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+    <ImageButton
+        android:id="@+id/imageButton_favorite_toggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/btn_star_big_off"
+        android:contentDescription="Toggle Favorite"/>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <Button
+        android:id="@+id/button_get_directions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Get Directions"/>
+
+    <Button
+        android:id="@+id/button_spin_again"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Spin Again"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+</LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>

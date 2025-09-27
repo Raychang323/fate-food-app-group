@@ -87,13 +87,13 @@ class MainActivity : AppCompatActivity(),
         val navController = findNavController(R.id.nav_host_fragment_content_main)
 
         appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.connoisseurCheckFragment),
+            setOf(
+                R.id.connoisseurCheckFragment,
+            ),
             drawerLayout
         )
 
-        // 必須保留：設置 Toolbar 標題和圖標的初始狀態
         setupActionBarWithNavController(navController, appBarConfiguration)
-
         navView.setupWithNavController(navController)
 
         toggle = ActionBarDrawerToggle(
@@ -105,11 +105,8 @@ class MainActivity : AppCompatActivity(),
         )
         drawerLayout.addDrawerListener(toggle)
 
-        // ⭐ 關鍵修正：手動設置 Toolbar 導航點擊監聽器以繞過事件衝突
         binding.appBarMain.toolbar.setNavigationOnClickListener {
-            // 檢查 toggle 的狀態來判斷當前顯示的是什麼圖標
             if (toggle.isDrawerIndicatorEnabled) {
-                // 如果是漢堡圖標，手動開/關抽屜
                 if (drawerLayout.isDrawerOpen(navView)) {
                     drawerLayout.closeDrawer(navView)
                 } else {
@@ -117,27 +114,20 @@ class MainActivity : AppCompatActivity(),
                 }
                 Log.d(TAG, "Toolbar Navigation Click: Drawer Toggle (Hamburger) activated.")
             } else {
-                // 如果是返回箭頭，執行向上導航
                 onSupportNavigateUp()
                 Log.d(TAG, "Toolbar Navigation Click: Up Arrow (Back) activated.")
             }
         }
 
-        // 負責切換圖標的邏輯
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val isTopLevelDestination = appBarConfiguration.topLevelDestinations.contains(destination.id)
-
             if (isTopLevelDestination) {
-                // 主頁面：顯示漢堡圖標 (≡)
                 drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-                toggle.isDrawerIndicatorEnabled = true // 設置為漢堡狀態
+                toggle.isDrawerIndicatorEnabled = true
             } else {
-                // 非主頁面：顯示返回箭頭 (←)
                 drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                toggle.isDrawerIndicatorEnabled = false // 設置為返回狀態
+                toggle.isDrawerIndicatorEnabled = false
             }
-
-            // 這會觸發圖標的實際切換（無動畫），但確保狀態正確
             toggle.syncState()
             Log.d(TAG, "Destination changed. Drawer indicator enabled: ${toggle.isDrawerIndicatorEnabled}")
         }
@@ -184,32 +174,20 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    // 由於我們使用 setNavigationOnClickListener 處理了導航圖標的點擊，
-    // onOptionsItemSelected 只需要處理 Toolbar 上的其他選單項目。
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // 忽略導航圖標的點擊，避免干擾手動設置的 setNavigationOnClickListener
         if (item.itemId == android.R.id.home) {
             return false
         }
         return super.onOptionsItemSelected(item)
     }
 
-
-    // 處理導航返回邏輯
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
-
         Log.d(TAG, "onSupportNavigateUp called. Attempting NavController.navigateUp.")
-
-        // 確保使用帶有 appBarConfiguration 的 navigateUp
         val navigated = navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-
         Log.d(TAG, "navController.navigateUp result: $navigated")
-
         return navigated
     }
-
-    // --- 輔助方法定義 ---
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
@@ -288,39 +266,42 @@ class MainActivity : AppCompatActivity(),
         return true
     }
 
-    // --- Interface 實作 ---
-
-    override fun onNotificationSettingsSaved() {
-        Log.d(TAG, "Notification settings saved. Rescheduling with scheduleNotifications and proceeding to blacklist.")
+    // Updated Interface Implementation
+    override fun onNotificationSettingsSaved(isFirstTimeSetupContext: Boolean) {
+        Log.d(TAG, "Notification settings saved. isFirstTimeSetupContext: $isFirstTimeSetupContext. Rescheduling with scheduleNotifications.")
         NotificationScheduler.scheduleNotifications(this)
-        if (!::sharedPreferences.isInitialized) {
-            sharedPreferences = getSharedPreferences(SetupConstants.PREFS_NAME, MODE_PRIVATE)
+        if (isFirstTimeSetupContext) { // Only proceed if it's the first time setup
+            if (!::sharedPreferences.isInitialized) {
+                sharedPreferences = getSharedPreferences(SetupConstants.PREFS_NAME, MODE_PRIVATE)
+            }
+            // It seems KEY_FIRST_TIME_SETUP_COMPLETED is marked true in SupperBlacklistDialog
+            // when 'Save and Finish' is clicked, or when 'Skip' is clicked there.
+            // So, no need to set it here if we are always showing SupperBlacklistDialog next in first-time setup.
+            // If SupperBlacklistDialog is skipped, it will handle setting the completed flag.
+            Log.d(TAG, "Proceeding to blacklist dialog as part of first-time setup.")
+            showSupperBlacklistDialog() // This method already passes isFirstTimeSetup = true
         }
-        sharedPreferences.edit {
-            putBoolean(SetupConstants.KEY_FIRST_TIME_SETUP_COMPLETED, true)
-        }
-        Log.d(TAG, "Marked KEY_FIRST_TIME_SETUP_COMPLETED as true.")
-        showSupperBlacklistDialog()
     }
 
-    override fun onNotificationSetupSkipped() {
-        Log.d(TAG, "Notification setup skipped. Ensuring notifications reflect this (likely cancelled or default) and proceeding to blacklist.")
-        NotificationScheduler.scheduleNotifications(this)
-        if (!::sharedPreferences.isInitialized) {
-            sharedPreferences = getSharedPreferences(SetupConstants.PREFS_NAME, MODE_PRIVATE)
+    override fun onNotificationSetupSkipped(isFirstTimeSetupContext: Boolean) {
+        Log.d(TAG, "Notification setup skipped. isFirstTimeSetupContext: $isFirstTimeSetupContext. Ensuring notifications reflect this.")
+        NotificationScheduler.scheduleNotifications(this) // Ensure scheduler reflects current state (e.g. defaults)
+        if (isFirstTimeSetupContext) { // Only proceed if it's the first time setup
+             // Similar to onNotificationSettingsSaved, KEY_FIRST_TIME_SETUP_COMPLETED will be handled by SupperBlacklistDialog.
+            Log.d(TAG, "Proceeding to blacklist dialog as part of first-time setup (after skipping notifications).")
+            showSupperBlacklistDialog() // This method already passes isFirstTimeSetup = true
         }
-        sharedPreferences.edit {
-            putBoolean(SetupConstants.KEY_FIRST_TIME_SETUP_COMPLETED, true)
-        }
-        Log.d(TAG, "Marked KEY_FIRST_TIME_SETUP_COMPLETED as true.")
-        showSupperBlacklistDialog()
     }
 
     override fun onBlacklistSettingsSaved() {
         Log.d(TAG, "Supper blacklist settings saved.")
+        // Mark setup as fully completed ONLY if it was part of the first-time flow.
+        // SupperBlacklistDialog now handles this internally via its own isFirstTimeSetup state.
     }
 
     override fun onBlacklistSetupSkipped() {
         Log.d(TAG, "Supper blacklist setup skipped.")
+        // Mark setup as fully completed ONLY if it was part of the first-time flow.
+        // SupperBlacklistDialog now handles this internally via its own isFirstTimeSetup state.
     }
 }

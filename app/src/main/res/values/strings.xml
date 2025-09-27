@@ -24,4 +24,8 @@
     <string name="notification_permission_rationale">請允許通知權限以接收每日宵夜推薦。</string>
     <string name="test_notification_scheduled_message">Test notification (15s) scheduled! (Debug only)</string>
 
+    <!-- Supper Blacklist Dialog Strings -->
+    <string name="dialog_blacklist_title">排除宵夜類型 (黑名單)</string>
+    <string name="dialog_blacklist_description">選擇您不希望看到的宵夜類型：</string>
+    <string name="content_description_blacklist_scrollview">可滾動的宵夜類型黑名單選項</string>
 </resources>

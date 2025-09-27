@@ -11,21 +11,21 @@ import android.widget.CheckBox
 import android.widget.TimePicker
 import androidx.fragment.app.DialogFragment
 import com.fatefulsupper.app.R
-import com.fatefulsupper.app.util.NotificationScheduler // Added import
+import com.fatefulsupper.app.util.NotificationScheduler
 import com.fatefulsupper.app.util.SetupConstants
 
 class NotificationSettingsDialog : DialogFragment() {
 
+    // Updated Listener Interface
     interface NotificationDialogListener {
-        fun onNotificationSettingsSaved()
-        fun onNotificationSetupSkipped()
+        fun onNotificationSettingsSaved(isFirstTimeSetupContext: Boolean)
+        fun onNotificationSetupSkipped(isFirstTimeSetupContext: Boolean)
     }
 
     private var listener: NotificationDialogListener? = null
     private var isFirstTimeSetup: Boolean = true
 
     private lateinit var checkboxMonday: CheckBox
-    // ... (other checkboxes)
     private lateinit var checkboxTuesday: CheckBox
     private lateinit var checkboxWednesday: CheckBox
     private lateinit var checkboxThursday: CheckBox
@@ -92,22 +92,14 @@ class NotificationSettingsDialog : DialogFragment() {
 
         buttonSaveNext.setOnClickListener {
             saveSettings()
-            NotificationScheduler.scheduleNotifications(requireContext()) // Reschedule
-            listener?.onNotificationSettingsSaved()
+            NotificationScheduler.scheduleNotifications(requireContext())
+            listener?.onNotificationSettingsSaved(isFirstTimeSetup) // Pass isFirstTimeSetup
             dismiss()
         }
 
         buttonSkipCancel.setOnClickListener {
-            // Even if skipped/cancelled, ensure the scheduler reflects the current state
-            // (e.g., if user unselected all days and then skipped, alarms should be cancelled)
-            // saveSettings() is not called here, so it uses the settings *before* this dialog was shown,
-            // or the last saved state if coming from settings.
-            // A more robust approach might be to only schedule if settings *were* saved,
-            // or to explicitly pass a "shouldSave" flag.
-            // For now, scheduling based on current SharedPreferences is reasonable.
-            // If the user "skips" first-time setup, default settings (which might be "no days") are used.
-            NotificationScheduler.scheduleNotifications(requireContext()) // Reschedule
-            listener?.onNotificationSetupSkipped()
+            NotificationScheduler.scheduleNotifications(requireContext())
+            listener?.onNotificationSetupSkipped(isFirstTimeSetup) // Pass isFirstTimeSetup
             dismiss()
         }
     }
