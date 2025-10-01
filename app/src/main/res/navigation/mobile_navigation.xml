@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -80,10 +81,9 @@
                 android:name="showRegistrationSuccessSnackbar"
                 app:argType="boolean"
                 android:defaultValue="true" />
-             <app:popUpTo
+            <app:popUpTo
                 android:id="@+id/loginFragment"
-                app:popUpToInclusive="true" />
-        </action>
+                app:popUpToInclusive="true" /> </action>
     </fragment>
 
     <fragment
@@ -91,7 +91,6 @@
         android:name="com.fatefulsupper.app.ui.main.LazyModeFragment"
         android:label="LazyModeFragment"
         tools:layout="@layout/fragment_lazy_mode">
-        <!-- Old actions to RestaurantList and Roulette are removed -->
         <action
             android:id="@+id/action_lazyModeFragment_to_loadingFragment"
             app:destination="@id/loadingFragment">
@@ -100,9 +99,20 @@
                 app:argType="string"
                 android:defaultValue="lazyMode" />
         </action>
+        <action
+            android:id="@+id/action_lazyModeFragment_to_restaurantListFragment"
+            app:destination="@id/restaurantListFragment" />
+        <action
+            android:id="@+id/action_lazyModeFragment_to_rouletteFragment"
+            app:destination="@id/rouletteFragment">
+            <argument
+                android:name="restaurantsForRoulette"
+                app:argType="com.fatefulsupper.app.data.model.Restaurant[]"
+                app:nullable="true"
+                android:defaultValue="@null" />
+        </action>
     </fragment>
 
-    <!-- +++++++++++++ NEW FRAGMENTS AND ACTIONS START HERE +++++++++++++ -->
     <fragment
         android:id="@+id/loadingFragment"
         android:name="com.fatefulsupper.app.ui.main.LoadingFragment"
@@ -121,8 +131,7 @@
             android:id="@+id/action_loadingFragment_to_restaurantListFragment"
             app:destination="@id/restaurantListFragment"
             app:popUpTo="@id/connoisseurCheckFragment"
-            app:popUpToInclusive="false" /> <!-- MODIFIED HERE -->
-    </fragment>
+            app:popUpToInclusive="false" /> </fragment>
 
     <fragment
         android:id="@+id/actionChoiceFragment"
@@ -136,7 +145,6 @@
             android:id="@+id/action_actionChoiceFragment_to_rouletteFragment"
             app:destination="@id/rouletteFragment" />
     </fragment>
-    <!-- +++++++++++++ NEW FRAGMENTS AND ACTIONS END HERE +++++++++++++ -->
 
     <fragment
         android:id="@+id/restaurantListFragment"
@@ -146,7 +154,6 @@
         <action
             android:id="@+id/action_restaurantListFragment_to_restaurantDetailsFragment"
             app:destination="@id/restaurantDetailsFragment" />
-        <!-- This argument is used by ActionChoiceFragment to pass data -->
         <argument
             android:name="restaurants"
             app:argType="com.fatefulsupper.app.data.model.Restaurant[]"

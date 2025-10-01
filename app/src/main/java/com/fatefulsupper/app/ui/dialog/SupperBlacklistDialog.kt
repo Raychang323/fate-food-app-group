@@ -18,6 +18,7 @@ class SupperBlacklistDialog : DialogFragment() {
 
     interface SupperBlacklistDialogListener {
         fun onBlacklistSettingsSaved(selectedCategoryIds: List<Int>) // 修改這裡，接收 List<Int>
+        fun onBlacklistSettingsSaved()
         fun onBlacklistSetupSkipped()
     }
 
@@ -84,6 +85,11 @@ class SupperBlacklistDialog : DialogFragment() {
                 markSetupAsFullyCompleted()
             }
             listener?.onBlacklistSettingsSaved(selectedCategoryIds) // 傳遞選中的 ID 清單
+            saveBlacklist()
+            if (isFirstTimeSetup) { // Only mark as fully completed if it's the first time setup
+                markSetupAsFullyCompleted()
+            }
+            listener?.onBlacklistSettingsSaved()
             dismiss()
         }
 
@@ -109,6 +115,10 @@ class SupperBlacklistDialog : DialogFragment() {
             val checkBox = CheckBox(context).apply {
                 text = displayName
                 tag = typeKey // 將 typeKey 設置為 tag
+        SetupConstants.SUPPER_TYPES_BLACKLIST_OPTIONS.forEach { (displayName, typeKey) ->
+            val checkBox = CheckBox(context).apply {
+                text = displayName
+                tag = typeKey
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -154,6 +164,17 @@ class SupperBlacklistDialog : DialogFragment() {
             apply()
         }
         return selectedCategoryIds
+    private fun saveBlacklist() {
+        val selectedBlacklistedTypes = mutableSetOf<String>()
+        dynamicallyCreatedCheckBoxes.forEach { (typeKey, checkBox) ->
+            if (checkBox.isChecked) {
+                selectedBlacklistedTypes.add(typeKey)
+            }
+        }
+        with(sharedPreferences.edit()) {
+            putStringSet(SetupConstants.KEY_BLACKLISTED_SUPPER_TYPES, selectedBlacklistedTypes)
+            apply()
+        }
     }
 
     private fun markSetupAsFullyCompleted() {

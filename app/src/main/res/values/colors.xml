@@ -20,6 +20,4 @@
     <color name="quadrant_selected_point_color_light">#FF888888</color>
     <color name="quadrant_center_point_color_light">#FFAAAAAA</color>
 
-    <color name="roulette_button_background">#FFD700</color> <!-- Gold -->
-    <color name="roulette_button_text_on_gold">#FF000000</color> <!-- Black for text on gold -->
-</resources>
+    <color name="roulette_button_background">#FFD700</color> <color name="roulette_button_text_on_gold">#FF000000</color> </resources>

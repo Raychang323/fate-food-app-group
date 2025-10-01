@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">fatefulsupper</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -11,7 +12,6 @@
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
 
-    <!-- Added button strings -->
     <string name="button_save">儲存</string>
     <string name="button_cancel">取消</string>
     <string name="button_next">下一步</string>
@@ -24,7 +24,6 @@
     <string name="notification_permission_rationale">請允許通知權限以接收每日宵夜推薦。</string>
     <string name="test_notification_scheduled_message">Test notification (15s) scheduled! (Debug only)</string>
 
-    <!-- Supper Blacklist Dialog Strings -->
     <string name="dialog_blacklist_title">排除宵夜類型 (黑名單)</string>
     <string name="dialog_blacklist_description">選擇您不希望看到的宵夜類型：</string>
     <string name="content_description_blacklist_scrollview">可滾動的宵夜類型黑名單選項</string>
@@ -38,7 +37,6 @@
     <string name="lazy_mode_completion_message_mood_prompt">所有卡片已滑完！\n請選擇您的心情與飢餓程度以獲取推薦！</string>
     <string name="lazy_mode_initial_prompt_mood_hunger">請選擇您的心情與飢餓程度，或滑動上方的卡片來表達您的偏好。</string>
 
-    <!-- Strings for UX-refined Toasts -->
     <string name="toast_location_permission_not_granted">位置權限未授予。部分功能可能受限。</string>
     <string name="mood_happy">開心</string>
     <string name="mood_unhappy">不開心</string>
@@ -54,5 +52,4 @@
     <string name="toast_location_permission_rationale">位置權限為推薦附近餐廳所必需，請考慮授予。</string>
     <string name="toast_location_permission_denied_permanently">位置權限先前已被永久拒絕。如需使用相關功能，請至應用程式設定開啟。</string>
     <string name="dialog_blacklist_warning_too_many_exclusions">請注意：如果排除過多選項，可能會導致「懶人模式」中沒有足夠的卡片可供滑動。</string>
-
 </resources>

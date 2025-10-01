@@ -3,6 +3,7 @@ package com.fatefulsupper.app.api
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -38,5 +39,22 @@ object RetrofitClient {
 
     val apiService: ApiService by lazy {
         retrofit.create(ApiService::class.java)
+    private const val BASE_URL = "http://10.0.2.2:8080/"
+
+    private val okHttpClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS) // 連線超時
+            .readTimeout(60, TimeUnit.SECONDS)    // 讀取超時
+            .writeTimeout(60, TimeUnit.SECONDS)   // 寫入超時
+            .build()
+    }
+
+    val apiService: MemberApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)                 // 使用自訂 OkHttpClient
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(MemberApiService::class.java)
     }
 }

@@ -42,6 +42,8 @@ object NotificationScheduler {
             SetupConstants.DEFAULT_NOTIFICATION_MINUTE
         )
 
+        // Cancel all previously scheduled notifications (including regular and old test ones)
+        // This is a broader cancel, ensuring a clean slate before scheduling new regular notifications.
         cancelScheduledNotifications(context)
 
         if (selectedDays.isEmpty()) {
@@ -197,6 +199,7 @@ object NotificationScheduler {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         // Cancel any previous test notification
+        // 1. First, cancel any PREVIOUSLY scheduled test notification specifically
         val oldTestIntent = Intent(context, NotificationReceiver::class.java).apply {
             action = "com.fatefulsupper.app.TEST_NOTIFICATION"
         }
@@ -213,6 +216,15 @@ object NotificationScheduler {
         }
 
         // Prepare new test notification
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE // Use FLAG_NO_CREATE to check if it exists
+        )
+        if (oldTestPendingIntent != null) {
+            alarmManager.cancel(oldTestPendingIntent)
+            oldTestPendingIntent.cancel() // Also cancel the PendingIntent itself
+            Log.d(TAG, "Cancelled PREVIOUS test notification (request code $TEST_NOTIFICATION_REQUEST_CODE)")
+        }
+
+        // Create the NEW intent and pendingIntent for the test notification
         val newTestIntent = Intent(context, NotificationReceiver::class.java).apply {
             action = "com.fatefulsupper.app.TEST_NOTIFICATION"
             putExtra("test_message", "This is a TEST NOTIFICATION!")
@@ -221,6 +233,7 @@ object NotificationScheduler {
         val newTestPendingIntent = PendingIntent.getBroadcast(
             context,
             TEST_NOTIFICATION_REQUEST_CODE, // Using the same request code to ensure it's "updated" or "replaced"
+            TEST_NOTIFICATION_REQUEST_CODE, // Re-using the same request code is fine, it will update due to FLAG_UPDATE_CURRENT
             newTestIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -235,6 +248,15 @@ object NotificationScheduler {
                     Log.d(TAG, "Attempting to open ACTION_REQUEST_SCHEDULE_EXACT_ALARM settings.")
                     context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
                         if (context !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12 (API 31) and higher
+            if (!alarmManager.canScheduleExactAlarms()) {
+                Log.e(TAG, "Cannot schedule exact alarms. App needs SCHEDULE_EXACT_ALARM and user must grant it via settings for this test notification.")
+                Toast.makeText(context, "無法排程此測試通知的精確時間，請在應用程式設定中允許「鬧鐘與提醒」權限。", Toast.LENGTH_LONG).show()
+                
+                try {
+                    Log.d(TAG, "Attempting to open ACTION_REQUEST_SCHEDULE_EXACT_ALARM settings.")
+                    context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     })
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to open ACTION_REQUEST_SCHEDULE_EXACT_ALARM settings, falling back to ACTION_APPLICATION_DETAILS_SETTINGS.", e)
@@ -242,6 +264,7 @@ object NotificationScheduler {
                         context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                             data = Uri.parse("package:${context.packageName}")
                             if (context !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         })
                     } catch (e2: Exception) {
                          Log.e(TAG, "Failed to open ACTION_APPLICATION_DETAILS_SETTINGS.", e2)
@@ -253,6 +276,15 @@ object NotificationScheduler {
         }
         
         val calendar = Calendar.getInstance().apply {
+                return // Stop execution if permission is not granted
+            }
+        }
+        
+        // Note: We are no longer calling the broad cancelScheduledNotifications(context) here
+        // to avoid cancelling the PendingIntent we just created for the new test notification.
+        // The specific cancellation of the *old* test notification is handled above.
+
+        val calendar = Calendar.getInstance().apply { // Calendar setup should be after permission check & old alarm cancellation
             add(Calendar.SECOND, triggerDelaySeconds)
         }
 
@@ -262,6 +294,7 @@ object NotificationScheduler {
                 AlarmManager.RTC_WAKEUP,
                 calendar.timeInMillis,
                 newTestPendingIntent
+                newTestPendingIntent // Use the new pendingIntent
             )
             Log.d(TAG, "[setExact] NEW SINGLE TEST NOTIFICATION scheduled successfully for ${calendar.time}")
             Toast.makeText(context, "已設定測試通知，將於 $triggerDelaySeconds 秒後觸發", Toast.LENGTH_SHORT).show()
@@ -278,6 +311,8 @@ object NotificationScheduler {
         // Cancel regular notifications
         val allPossibleDays = SetupConstants.DEFAULT_NOTIFICATION_DAYS.union(
             // Include all possible days to ensure any old/stray alarms are caught
+        // Cancel repeating notification schedules
+        val allPossibleDays = SetupConstants.DEFAULT_NOTIFICATION_DAYS.union(
             setOf("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY")
         )
         allPossibleDays.forEach { dayString ->
@@ -294,12 +329,18 @@ object NotificationScheduler {
                 if (pendingIntent != null) { // Only cancel if it actually exists
                     alarmManager.cancel(pendingIntent)
                     pendingIntent.cancel() // Also cancel the PendingIntent itself
+                    PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+                )
+                if (pendingIntent != null) {
+                    alarmManager.cancel(pendingIntent)
+                    pendingIntent.cancel()
                     Log.d(TAG, "Cancelled repeating notification schedule for request code $pendingIntentRequestCode")
                 }
             }
         }
 
         // Cancel any active test notification
+        // Cancel test notification schedule specifically as well (this makes the function a complete cancel-all)
         val testNotificationIntent = Intent(context, NotificationReceiver::class.java).apply {
             action = "com.fatefulsupper.app.TEST_NOTIFICATION"
         }
@@ -327,3 +368,4 @@ object NotificationScheduler {
         }
     }
 }
+       

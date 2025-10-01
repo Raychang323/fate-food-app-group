@@ -24,6 +24,16 @@ open class Event<out T>(private val content: T) {
     @Suppress("unused")
     fun peekContent(): T = content
 }
+import com.fatefulsupper.app.api.ApiClient
+import com.fatefulsupper.app.api.ApiService
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+// Event wrapper for one-time consumable events
+
 
 class LoginViewModel : ViewModel() {
 
@@ -61,6 +71,66 @@ class LoginViewModel : ViewModel() {
             _isLoading.value = false
         }
     }
+
+
+    private val apiService: ApiService by lazy {
+        ApiClient.getClient().create(ApiService::class.java)
+    }
+
+    fun login(usernameOrEmail: String, password: String) {
+        _isLoading.value = true
+        _loginError.value = null
+
+        val call = apiService.login(usernameOrEmail, password)
+
+        call.enqueue(object : Callback<Map<String, Any>> {
+            override fun onResponse(
+                call: Call<Map<String, Any>>,
+                response: Response<Map<String, Any>>
+            ) {
+                _isLoading.value = false
+
+                try {
+                    // 嘗試解析 body
+                    val result = response.body()
+                    if (response.isSuccessful && result != null) {
+                        if (result["status"] == "ok") {
+                            val username = result["username"]?.toString() ?: ""
+                            _snackbarMessage.value = Event("歡迎 $username")
+                            _loginResult.value = true
+                        } else {
+                            // 後端回傳 JSON，但 status = error
+                            _loginError.value = result["message"]?.toString() ?: "登入失敗"
+                            _loginResult.value = false
+                        }
+                    } else {
+                        // 非 2xx，例如 401/403，嘗試解析 errorBody
+                        val errorBody = response.errorBody()?.string()
+                        if (!errorBody.isNullOrEmpty()) {
+                            // 可解析 JSON 或直接顯示文字
+                            _loginError.value = "帳號或密碼錯誤"
+                        } else {
+                            _loginError.value = "帳號或密碼錯誤或伺服器回應錯誤"
+                        }
+                        _loginResult.value = false
+                    }
+                } catch (e: Exception) {
+                    // 解析過程出錯
+                    _loginError.value = "登入失敗: ${e.localizedMessage}"
+                    _loginResult.value = false
+                }
+            }
+
+            override fun onFailure(
+                call: Call<Map<String, Any>?>,
+                t: Throwable
+            ) {
+                _loginResult.value = false // Reset result to prevent re-navigation on config change
+                _loginError.value = null            }
+
+        })
+    }
+
 
     // Call this method when navigation away from login occurs or error is handled
     fun onLoginAttemptComplete() {
