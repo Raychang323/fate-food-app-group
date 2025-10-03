@@ -13,10 +13,21 @@
         android:layout_marginBottom="16dp"/>
 
     <TextView
+        android:id="@+id/textView_blacklist_description" 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/dialog_blacklist_description"
         android:layout_marginBottom="8dp"/>
+
+    <!-- NEW WARNING TEXTVIEW ADDED HERE -->
+    <TextView
+        android:id="@+id/textView_blacklist_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_blacklist_warning_too_many_exclusions"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption" 
+        android:textColor="?android:attr/textColorSecondary" 
+        android:layout_marginBottom="16dp"/> 
 
     <ScrollView
         android:layout_width="match_parent"

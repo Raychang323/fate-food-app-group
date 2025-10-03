@@ -28,4 +28,31 @@
     <string name="dialog_blacklist_title">排除宵夜類型 (黑名單)</string>
     <string name="dialog_blacklist_description">選擇您不希望看到的宵夜類型：</string>
     <string name="content_description_blacklist_scrollview">可滾動的宵夜類型黑名單選項</string>
+
+    <string name="lazy_mode_recommendations_ready">推薦結果已準備好，即將跳轉...</string>
+    <string name="lazy_mode_completion_message"> </string>
+    <string name="lazy_mode_action_prompt">推薦已生成，請選擇下一步：</string>
+    <string name="lazy_mode_initial_prompt">請點擊四象限圖開始推薦！</string>
+
+    <string name="lazy_mode_no_cards_available_prompt">目前沒有符合的宵夜卡片\n請調整您的黑名單或稍後嘗試！</string>
+    <string name="lazy_mode_completion_message_mood_prompt">所有卡片已滑完！\n請選擇您的心情與飢餓程度以獲取推薦！</string>
+    <string name="lazy_mode_initial_prompt_mood_hunger">請選擇您的心情與飢餓程度，或滑動上方的卡片來表達您的偏好。</string>
+
+    <!-- Strings for UX-refined Toasts -->
+    <string name="toast_location_permission_not_granted">位置權限未授予。部分功能可能受限。</string>
+    <string name="mood_happy">開心</string>
+    <string name="mood_unhappy">不開心</string>
+    <string name="mood_neutral">一般</string>
+    <string name="hunger_hungry">飢餓</string>
+    <string name="hunger_not_hungry">不餓</string>
+    <string name="hunger_neutral">一般</string>
+    <string name="toast_mood_hunger_selected">已選擇 心情: %1$s, 飢餓度: %2$s</string>
+    <string name="toast_navigation_to_loading_failed">無法開始載入推薦</string>
+    <string name="toast_location_manager_unavailable">無法偵測到定位服務</string>
+    <string name="toast_location_services_disabled_prompt">請先開啟系統定位服務以獲取位置</string>
+    <string name="toast_location_fetch_failed">獲取位置失敗，請檢查定位服務或稍後重試。</string>
+    <string name="toast_location_permission_rationale">位置權限為推薦附近餐廳所必需，請考慮授予。</string>
+    <string name="toast_location_permission_denied_permanently">位置權限先前已被永久拒絕。如需使用相關功能，請至應用程式設定開啟。</string>
+    <string name="dialog_blacklist_warning_too_many_exclusions">請注意：如果排除過多選項，可能會導致「懶人模式」中沒有足夠的卡片可供滑動。</string>
+
 </resources>

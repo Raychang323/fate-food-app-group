@@ -81,6 +81,7 @@ class LoginFragment : Fragment() {
                 lifecycleScope.launch {
                     delay(1000) // Adjust delay as needed, or use Snackbar callback
                     if(isAdded) { // Ensure fragment is still added
+                        com.fatefulsupper.app.util.NotificationScheduler.checkLocationServices(requireActivity())
                         findNavController().navigate(R.id.action_loginFragment_to_lazyModeFragment)
                         viewModel.onLoginAttemptComplete() // Reset LiveData
                     }

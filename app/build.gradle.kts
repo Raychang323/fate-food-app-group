@@ -43,7 +43,8 @@ android {
 }
 
 dependencies {
-
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+// 請檢查並使用最新版本
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
