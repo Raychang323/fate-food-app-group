@@ -13,8 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.fatefulsupper.app.R
-import com.fatefulsupper.app.api.ApiClient
-import com.fatefulsupper.app.api.ApiService
+import com.fatefulsupper.app.util.NotificationScheduler
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.delay
@@ -61,7 +60,6 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (navArgs.showRegistrationSuccessSnackbar) {
-            // Check if this specific snackbar has already been shown for this navArgs instance
             val snackbarShownKey = "registration_snackbar_shown_${navArgs.hashCode()}"
             if (findNavController().currentBackStackEntry?.savedStateHandle?.get<Boolean>(snackbarShownKey) != true) {
                 viewModel.onNavigatedFromRegistrationSuccess()
@@ -77,15 +75,12 @@ class LoginFragment : Fragment() {
 
         viewModel.loginResult.observe(viewLifecycleOwner) { loginSuccess ->
             if (loginSuccess) {
-                // Snackbar for login success is now triggered from ViewModel
-                // We will navigate after the snackbar has had a chance to be seen (or use its callback)
-                // For simplicity now, we can add a small delay before navigation.
                 lifecycleScope.launch {
-                    delay(1000) // Adjust delay as needed, or use Snackbar callback
-                    if(isAdded) { // Ensure fragment is still added
-                        com.fatefulsupper.app.util.NotificationScheduler.checkLocationServices(requireActivity())
+                    delay(1000) 
+                    if(isAdded) { 
+                        NotificationScheduler.checkLocationServices(requireActivity())
                         findNavController().navigate(R.id.action_loginFragment_to_lazyModeFragment)
-                        viewModel.onLoginAttemptComplete() // Reset LiveData
+                        viewModel.onLoginAttemptComplete() 
                     }
                 }
             }
@@ -107,7 +102,6 @@ class LoginFragment : Fragment() {
         super.onPause()
         if (viewModel.isLoading.value == false) {
             errorTextView.isVisible = false
-            // Keep loginResult and snackbarMessage as is, they are handled by Event or specific flags
         }
     }
 }

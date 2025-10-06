@@ -7,13 +7,31 @@
     android:background="?attr/colorSurface"
     tools:context=".ui.main.LazyModeFragment">
 
+    <!-- 1. 狀態訊息 (Status Message) -->
+    <TextView
+        android:id="@+id/textView_status_message_lazy_mode"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:textColor="?attr/colorOnSurface"
+        android:textAlignment="center"
+        android:padding="16dp"
+        android:visibility="gone"
+        tools:text="請透過下方輪盤選擇您的心情與飢餓程度。"
+        tools:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"/>
+
+    <!-- 2. 食物卡片視圖 (Card View) - 用於顯示推薦食物 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardView_food_item"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:cardElevation="8dp"
         app:cardCornerRadius="16dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_status_message_lazy_mode"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout_controls_lazy_mode"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,7 +54,8 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/guideline_card_text_start"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                android:contentDescription="Food image placeholder" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_card_text_start"
@@ -49,7 +68,6 @@
                 android:id="@+id/textView_food_card_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceHeadline6"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                 tools:text="卡片名稱"
                 android:paddingStart="16dp"
@@ -63,7 +81,6 @@
                 android:id="@+id/textView_food_card_description"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:textAppearance="?attr/textAppearanceBody1"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 tools:text="這是一段關於這張卡片的描述文字，解釋了它的內容和意義。"
                 android:paddingStart="16dp"
@@ -78,30 +95,63 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Status message TextView -->
-    <TextView
-        android:id="@+id/textView_status_message_lazy_mode"
+    <!-- 3. 無更多卡片容器 (No More Cards Container) - 用於流程結束時的訊息 -->
+    <LinearLayout
+        android:id="@+id/linearLayout_no_more_cards_container"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceSubtitle1"
-        android:textColor="?attr/colorOnSurface"
-        android:textAlignment="center"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
         android:padding="16dp"
         android:visibility="gone"
-        tools:text="請透過下方輪盤選擇您的心情與飢餓程度。"
-        tools:visibility="visible"
-        app:layout_constraintTop_toTopOf="parent"
+        android:background="@android:color/transparent"
+        tools:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/textView_status_message_lazy_mode"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout_controls_lazy_mode"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp"/>
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp">
 
+        <TextView
+            android:id="@+id/textView_completion_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:textColor="?attr/colorOnSurface"
+            android:textAlignment="center"
+            android:text="感謝您的選擇！準備好查看為您量身打造的推薦了嗎？"
+            android:visibility="visible" />
 
+        <Button
+            android:id="@+id/button_get_recommendations"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="查看AI推薦"
+            android:layout_marginTop="24dp"
+            android:visibility="visible"/>
+
+        <Button
+            android:id="@+id/button_go_to_roulette_from_lazy"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="試試輪盤"
+            android:layout_marginTop="16dp"
+            android:visibility="visible"/>
+
+    </LinearLayout>
+
+    <!-- 4. 輪盤/選擇區域 (Custom Quadrant View) - 用於選擇心情/飢餓程度 -->
     <com.fatefulsupper.app.ui.custom.CustomQuadrantView
         android:id="@+id/quadrant_view_mood_hunger"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="40dp"
         android:visibility="gone"
+        android:background="@android:color/transparent"
         tools:visibility="visible"
         app:layout_constraintTop_toBottomOf="@+id/textView_status_message_lazy_mode"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout_controls_lazy_mode"
@@ -113,7 +163,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"/>
 
-
+    <!-- 5. 控制按鈕 (Like/Dislike Controls) -->
     <LinearLayout
         android:id="@+id/linearLayout_controls_lazy_mode"
         android:layout_width="match_parent"
@@ -121,12 +171,12 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:paddingTop="16dp"
-        android:paddingBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout_navigation_buttons_lazy_mode">
+        android:paddingBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
             android:id="@+id/button_dislike"
-            style="?attr/materialButtonOutlinedStyle"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="不感興趣"
@@ -141,152 +191,4 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/linearLayout_navigation_buttons_lazy_mode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingBottom="24dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <Button
-            android:id="@+id/button_go_to_list_from_lazy"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="舊的列表按鈕 (隱藏)"
-            android:visibility="gone"
-            android:layout_marginEnd="8dp"/>
-
-    </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- START: Added CustomQuadrantView and optional Submit Button -->
-    <com.fatefulsupper.app.ui.custom.CustomQuadrantView
-        android:id="@+id/quadrant_view_mood_hunger"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="40dp"
-        android:layout_marginTop="16dp"
-        android:visibility="gone"
-        tools:visibility="visible"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintBottom_toTopOf="@+id/linearLayout_controls_lazy_mode"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Optional Submit Button -->
-    <!--
-    <Button
-        android:id="@+id/button_submit_mood_hunger"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="確認狀態"
-        android:visibility="gone"
-        tools:visibility="visible"
-        app:layout_constraintTop_toBottomOf="@+id/quadrant_view_mood_hunger"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"/>
-    -->
-    <!-- END: Added CustomQuadrantView -->
-
-
-    <LinearLayout
-        android:id="@+id/linearLayout_no_more_cards_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="16dp"
-    android:visibility="gone"
-    tools:visibility="gone"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintBottom_toTopOf="@+id/linearLayout_controls_lazy_mode"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    android:layout_marginStart="32dp"
-    android:layout_marginEnd="32dp"
-    android:layout_marginTop="24dp"
-    android:layout_marginBottom="24dp">
-
-    <TextView
-        android:id="@+id/textView_completion_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-        android:textColor="?attr/colorOnSurface"
-        android:textAlignment="center"
-        android:visibility="visible"
-        tools:text="感謝您的選擇！準備好查看為您量身打造的推薦了嗎？" />
-
-    <Button
-        android:id="@+id/button_get_recommendations"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="查看AI推薦"
-        android:layout_marginTop="24dp"
-        android:visibility="visible"
-        tools:visibility="visible"/>
-
-    <Button
-        android:id="@+id/button_go_to_roulette_from_lazy"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="試試輪盤"
-        android:layout_marginTop="16dp"
-        android:visibility="visible"
-        tools:visibility="visible"/>
-
-</LinearLayout>
-
-<LinearLayout
-android:id="@+id/linearLayout_controls_lazy_mode"
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:orientation="horizontal"
-android:gravity="center"
-android:paddingTop="16dp"
-android:paddingBottom="16dp"
-app:layout_constraintBottom_toTopOf="@+id/linearLayout_navigation_buttons_lazy_mode">
-
-<Button
-    android:id="@+id/button_dislike"
-    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="不感興趣"
-    android:layout_marginEnd="16dp"/>
-
-<Button
-    android:id="@+id/button_like"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="我喜歡"
-    android:layout_marginStart="16dp"/>
-
-</LinearLayout>
-
-<LinearLayout
-android:id="@+id/linearLayout_navigation_buttons_lazy_mode"
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:orientation="horizontal"
-android:gravity="center"
-android:paddingBottom="24dp"
-app:layout_constraintBottom_toBottomOf="parent">
-
-<Button
-    android:id="@+id/button_go_to_list_from_lazy"
-    style="@style/Widget.MaterialComponents.Button.TextButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="舊的列表按鈕 (隱藏)"
-    android:visibility="gone"
-    android:layout_marginEnd="8dp"/>
-
-</LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>

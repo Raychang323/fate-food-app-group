@@ -4,10 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
-import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
@@ -23,40 +19,11 @@ import com.google.android.material.textfield.TextInputEditText
 class RegisterFragment : Fragment() {
 
     private lateinit var viewModel: RegisterViewModel
-    private lateinit var usernameEditText: TextInputEditText
-    private lateinit var emailEditText: TextInputEditText
-    private lateinit var passwordEditText: TextInputEditText
-    private lateinit var confirmPasswordEditText: TextInputEditText
-    private lateinit var registerButton: Button
-    private lateinit var errorTextView: TextView
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_register, container, false)
-        viewModel = ViewModelProvider(this).get(RegisterViewModel::class.java)
-
-        usernameEditText = view.findViewById(R.id.editText_username_register)
-        emailEditText = view.findViewById(R.id.editText_email_register)
-        passwordEditText = view.findViewById(R.id.editText_password_register)
-        confirmPasswordEditText = view.findViewById(R.id.editText_confirm_password_register)
-        registerButton = view.findViewById(R.id.button_register_submit)
-        errorTextView = view.findViewById(R.id.textView_register_error)
-
-        registerButton.setOnClickListener {
-            val username = usernameEditText.text.toString().trim()
-            val email = emailEditText.text.toString().trim()
-            val password = passwordEditText.text.toString()
-            val confirmPassword = confirmPasswordEditText.text.toString()
-            viewModel.register(username, email, password, confirmPassword)
-        }
-
-        observeViewModel()
     private lateinit var editTextUserId: TextInputEditText
-    private lateinit var editTextPassword: TextInputEditText
-    private lateinit var editTextEmail: TextInputEditText
     private lateinit var editTextUsername: TextInputEditText
+    private lateinit var editTextEmail: TextInputEditText
+    private lateinit var editTextPassword: TextInputEditText
     private lateinit var confirmPasswordEditText: TextInputEditText
     private lateinit var spinnerRole: Spinner
     private lateinit var registerButton: Button
@@ -67,7 +34,7 @@ class RegisterFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         val view = inflater.inflate(R.layout.fragment_register, container, false)
 
         viewModel = ViewModelProvider(this)[RegisterViewModel::class.java]
@@ -76,9 +43,9 @@ class RegisterFragment : Fragment() {
         editTextUserId = view.findViewById(R.id.editText_userid_register)
         editTextPassword = view.findViewById(R.id.editText_password_register)
         editTextEmail = view.findViewById(R.id.editText_email_register)
-        editTextUsername = view.findViewById(R.id.editText_username_register)
+        editTextUsername = view.findViewById(R.id.editText_name_register)
         confirmPasswordEditText = view.findViewById(R.id.editText_confirm_password_register)
-        spinnerRole = view.findViewById(R.id.autoCompleteRole)
+        spinnerRole = view.findViewById(R.id.spinner_role)
         registerButton = view.findViewById(R.id.button_register_submit)
         errorTextView = view.findViewById(R.id.textView_register_error)
 
@@ -89,23 +56,6 @@ class RegisterFragment : Fragment() {
         return view
     }
 
-    private fun observeViewModel() {
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            registerButton.isEnabled = !isLoading
-            // You could also show/hide a ProgressBar here
-        }
-
-        viewModel.registrationStepResult.observe(viewLifecycleOwner) { registrationSuccess ->
-            if (registrationSuccess) {
-                findNavController().navigate(R.id.action_registerFragment_to_emailVerificationFragment)
-                viewModel.onRegistrationAttemptComplete() // Reset LiveData
-            }
-        }
-
-        viewModel.registrationError.observe(viewLifecycleOwner) { errorMessage ->
-            errorTextView.text = errorMessage
-            errorTextView.isVisible = errorMessage != null
-        }
     private fun setupSpinner() {
         val adapter = ArrayAdapter(
             requireContext(),
@@ -162,34 +112,26 @@ class RegisterFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        // 按鈕防重複點擊
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
             registerButton.isEnabled = !isLoading
         })
 
-        // 註冊成功單次導航
         viewModel.registrationStepResult.observe(viewLifecycleOwner, Observer { success ->
             success?.let {
                 if (it) {
-                    // 取得 userid
                     val userid = editTextUserId.text.toString().trim()
-
-                    // 準備 bundle 傳給 EmailVerificationFragment
                     val bundle = Bundle().apply {
                         putString("userid", userid)
                     }
-
                     findNavController().navigate(
                         R.id.action_registerFragment_to_emailVerificationFragment,
                         bundle
                     )
-
                     viewModel.onRegistrationAttemptComplete()
                 }
             }
         })
 
-        // 錯誤訊息單次顯示
         viewModel.registrationError.observe(viewLifecycleOwner, Observer { error ->
             error?.let { showError(it) }
         })
@@ -197,11 +139,6 @@ class RegisterFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        // Clear error when navigating away or fragment is paused, unless a registration is in progress
-        if (viewModel.isLoading.value == false) {
-            errorTextView.isVisible = false
-            viewModel.onRegistrationAttemptComplete() // also clears the error in ViewModel
-        // 生命週期安全清理
         if (viewModel.isLoading.value == false) {
             errorTextView.isVisible = false
             viewModel.onRegistrationAttemptComplete()

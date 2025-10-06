@@ -1,7 +1,6 @@
 package com.fatefulsupper.app
 
 import android.Manifest
-import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -12,7 +11,6 @@ import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -20,7 +18,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -60,19 +57,15 @@ class MainActivity : AppCompatActivity(),
                     sharedPreferences = getSharedPreferences(SetupConstants.PREFS_NAME, MODE_PRIVATE)
                 }
                 if (isGranted) {
-                    Log.d(TAG, "POST_NOTIFICATIONS permission granted by user.")
                     if (sharedPreferences.getBoolean(SetupConstants.KEY_FIRST_TIME_SETUP_COMPLETED, false)) {
-                        Log.d(TAG, "POST_NOTIFICATIONS granted, re-evaluating and scheduling notifications.")
                         NotificationScheduler.scheduleNotifications(this)
                     }
                 } else {
-                    Log.w(TAG, "POST_NOTIFICATIONS permission denied by user.")
                     Toast.makeText(
                         this,
                         getString(R.string.notification_permission_denied_message),
                         Toast.LENGTH_LONG
                     ).show()
-                    Log.d(TAG, "POST_NOTIFICATIONS denied, cancelling all scheduled notifications.")
                     NotificationScheduler.cancelScheduledNotifications(this)
                 }
             }
@@ -87,9 +80,7 @@ class MainActivity : AppCompatActivity(),
         val navController = findNavController(R.id.nav_host_fragment_content_main)
 
         appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.connoisseurCheckFragment,
-            ),
+            setOf(R.id.connoisseurCheckFragment, R.id.lazyModeFragment),
             drawerLayout
         )
 
@@ -112,24 +103,16 @@ class MainActivity : AppCompatActivity(),
                 } else {
                     drawerLayout.openDrawer(navView)
                 }
-                Log.d(TAG, "Toolbar Navigation Click: Drawer Toggle (Hamburger) activated.")
             } else {
                 onSupportNavigateUp()
-                Log.d(TAG, "Toolbar Navigation Click: Up Arrow (Back) activated.")
             }
         }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val isTopLevelDestination = appBarConfiguration.topLevelDestinations.contains(destination.id)
-            if (isTopLevelDestination) {
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-                toggle.isDrawerIndicatorEnabled = true
-            } else {
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                toggle.isDrawerIndicatorEnabled = false
-            }
+            drawerLayout.setDrawerLockMode(if (isTopLevelDestination) DrawerLayout.LOCK_MODE_UNLOCKED else DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+            toggle.isDrawerIndicatorEnabled = isTopLevelDestination
             toggle.syncState()
-            Log.d(TAG, "Destination changed. Drawer indicator enabled: ${toggle.isDrawerIndicatorEnabled}")
         }
 
         NotificationHelper.createNotificationChannel(this)
@@ -138,21 +121,16 @@ class MainActivity : AppCompatActivity(),
         updateNavHeader()
 
         if (sharedPreferences.getBoolean(SetupConstants.KEY_FIRST_TIME_SETUP_COMPLETED, false)) {
-            Log.d(TAG, "Setup previously completed. Checking permissions for scheduling.")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "POST_NOTIFICATIONS already granted. Scheduling notifications.")
                     NotificationScheduler.scheduleNotifications(this)
                 } else {
-                    Log.i(TAG, "POST_NOTIFICATIONS not granted. Requesting permission. Notifications will be scheduled if granted.")
                     checkAndRequestNotificationPermission()
                 }
             } else {
-                Log.d(TAG, "Pre-TIRAMISU. Scheduling notifications.")
                 NotificationScheduler.scheduleNotifications(this)
             }
         } else {
-            Log.d(TAG, "First time setup not completed. Will launch dialog. Requesting notification permission first.")
             checkAndRequestNotificationPermission()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED &&
@@ -170,7 +148,6 @@ class MainActivity : AppCompatActivity(),
         super.onPostCreate(savedInstanceState)
         if (::toggle.isInitialized) {
             toggle.syncState()
-            Log.d(TAG, "onPostCreate: toggle.syncState() called.")
         }
     }
 
@@ -183,10 +160,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
-        Log.d(TAG, "onSupportNavigateUp called. Attempting NavController.navigateUp.")
-        val navigated = navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-        Log.d(TAG, "navController.navigateUp result: $navigated")
-        return navigated
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -197,27 +171,18 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun checkAndRequestNotificationPermission() {
-        if (!::sharedPreferences.isInitialized) {
-            sharedPreferences = getSharedPreferences(SetupConstants.PREFS_NAME, MODE_PRIVATE)
-        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             when {
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED -> {
-                    Log.d(TAG, "POST_NOTIFICATIONS permission already granted.")
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED -> {
                     if (sharedPreferences.getBoolean(SetupConstants.KEY_FIRST_TIME_SETUP_COMPLETED, false)) {
                         NotificationScheduler.scheduleNotifications(this)
                     }
                 }
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
-                    Log.i(TAG, "Showing rationale for POST_NOTIFICATIONS permission.")
                     Toast.makeText(this, getString(R.string.notification_permission_rationale), Toast.LENGTH_LONG).show()
                     requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
                 else -> {
-                    Log.d(TAG, "Requesting POST_NOTIFICATIONS permission for the first time or after previous denial without rationale.")
                     requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
             }
@@ -225,83 +190,48 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun checkAndLaunchFirstTimeSetup() {
-        if (!::sharedPreferences.isInitialized) {
-            sharedPreferences = getSharedPreferences(SetupConstants.PREFS_NAME, MODE_PRIVATE)
-        }
-        val isSetupCompleted = sharedPreferences.getBoolean(SetupConstants.KEY_FIRST_TIME_SETUP_COMPLETED, false)
-        if (!isSetupCompleted) {
-            Log.d(TAG, "First time setup not completed. Launching NotificationSettingsDialog.")
+        if (!sharedPreferences.getBoolean(SetupConstants.KEY_FIRST_TIME_SETUP_COMPLETED, false)) {
             showNotificationSettingsDialog()
-        } else {
-            Log.d(TAG, "First time setup already completed.")
         }
     }
 
     private fun updateNavHeader(username: String = "訪客") {
-        if (::binding.isInitialized) {
-            val headerView = binding.navView.getHeaderView(0)
-            val greetingTextView = headerView.findViewById<TextView>(R.id.textView_user_greeting)
-            greetingTextView.text = getString(R.string.user_greeting, username)
-        } else {
-            Log.e(TAG, "updateNavHeader: Binding not initialized!")
-        }
+        val headerView = binding.navView.getHeaderView(0)
+        val greetingTextView = headerView.findViewById<TextView>(R.id.textView_user_greeting)
+        greetingTextView.text = getString(R.string.user_greeting, username)
     }
 
     private fun showNotificationSettingsDialog() {
         if (supportFragmentManager.findFragmentByTag(NotificationSettingsDialog.TAG) == null) {
-            val dialog = NotificationSettingsDialog.newInstance(isFirstTimeSetup = true)
-            dialog.show(supportFragmentManager, NotificationSettingsDialog.TAG)
+            NotificationSettingsDialog.newInstance(isFirstTimeSetup = true).show(supportFragmentManager, NotificationSettingsDialog.TAG)
         }
     }
 
     private fun showSupperBlacklistDialog() {
         if (supportFragmentManager.findFragmentByTag(SupperBlacklistDialog.TAG) == null) {
-            val dialog = SupperBlacklistDialog.newInstance(isFirstTimeSetup = true)
-            dialog.show(supportFragmentManager, SupperBlacklistDialog.TAG)
+            SupperBlacklistDialog.newInstance(isFirstTimeSetup = true).show(supportFragmentManager, SupperBlacklistDialog.TAG)
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.drawer_menu, menu)
-        return true
-    }
-
-    // Updated Interface Implementation
     override fun onNotificationSettingsSaved(isFirstTimeSetupContext: Boolean) {
-        Log.d(TAG, "Notification settings saved. isFirstTimeSetupContext: $isFirstTimeSetupContext. Rescheduling with scheduleNotifications.")
         NotificationScheduler.scheduleNotifications(this)
-        if (isFirstTimeSetupContext) { // Only proceed if it's the first time setup
-            if (!::sharedPreferences.isInitialized) {
-                sharedPreferences = getSharedPreferences(SetupConstants.PREFS_NAME, MODE_PRIVATE)
-            }
-            // It seems KEY_FIRST_TIME_SETUP_COMPLETED is marked true in SupperBlacklistDialog
-            // when 'Save and Finish' is clicked, or when 'Skip' is clicked there.
-            // So, no need to set it here if we are always showing SupperBlacklistDialog next in first-time setup.
-            // If SupperBlacklistDialog is skipped, it will handle setting the completed flag.
-            Log.d(TAG, "Proceeding to blacklist dialog as part of first-time setup.")
-            showSupperBlacklistDialog() // This method already passes isFirstTimeSetup = true
+        if (isFirstTimeSetupContext) {
+            showSupperBlacklistDialog()
         }
     }
 
     override fun onNotificationSetupSkipped(isFirstTimeSetupContext: Boolean) {
-        Log.d(TAG, "Notification setup skipped. isFirstTimeSetupContext: $isFirstTimeSetupContext. Ensuring notifications reflect this.")
-        NotificationScheduler.scheduleNotifications(this) // Ensure scheduler reflects current state (e.g. defaults)
-        if (isFirstTimeSetupContext) { // Only proceed if it's the first time setup
-             // Similar to onNotificationSettingsSaved, KEY_FIRST_TIME_SETUP_COMPLETED will be handled by SupperBlacklistDialog.
-            Log.d(TAG, "Proceeding to blacklist dialog as part of first-time setup (after skipping notifications).")
-            showSupperBlacklistDialog() // This method already passes isFirstTimeSetup = true
+        NotificationScheduler.scheduleNotifications(this)
+        if (isFirstTimeSetupContext) {
+            showSupperBlacklistDialog()
         }
     }
 
-    override fun onBlacklistSettingsSaved() {
-        Log.d(TAG, "Supper blacklist settings saved.")
-        // Mark setup as fully completed ONLY if it was part of the first-time flow.
-        // SupperBlacklistDialog now handles this internally via its own isFirstTimeSetup state.
+    override fun onBlacklistSettingsSaved(blacklistedTypes: Set<String>) {
+        // Handled in SettingsFragment
     }
 
     override fun onBlacklistSetupSkipped() {
-        Log.d(TAG, "Supper blacklist setup skipped.")
-        // Mark setup as fully completed ONLY if it was part of the first-time flow.
-        // SupperBlacklistDialog now handles this internally via its own isFirstTimeSetup state.
+        // Handled in SettingsFragment
     }
 }

@@ -2,8 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-
-    <!-- 確保網路權限已宣告 -->
+    <!-- 權限應放在 <manifest> 標籤的直接子級 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
@@ -11,12 +10,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <application>
-
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
@@ -26,24 +19,16 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Shop"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/Theme.Fatefulsupper"
-        android:enableOnBackInvokedCallback="true">
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Fatefulsupper"
-            android:enableOnBackInvokedCallback="true">
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:enableOnBackInvokedCallback="true"
+        tools:replace="android:theme">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.FatefulSupper.NoActionBar"
-            android:exported="true"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.FatefulSupper.NoActionBar">
+            android:theme="@style/Theme.FatefulSupper.NoActionBar"> <!-- 保留一個清晰的 MainActivity 定義 -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -51,16 +36,11 @@
         </activity>
 
         <!-- 登入頁 -->
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".LoginActivity" android:exported="false" />
 
         <!-- 註冊頁 -->
-        <activity android:name=".RegisterActivity" />
-        <receiver
-            android:name=".receiver.NotificationReceiver"
-            android:enabled="true"
-            android:exported="false" />
+        <activity android:name=".RegisterActivity" android:exported="false" />
 
-    </application>
         <receiver
             android:name=".receiver.NotificationReceiver"
             android:enabled="true"

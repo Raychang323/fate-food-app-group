@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast // This import might become unused, which is fine
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -44,10 +44,8 @@ class RouletteFragment : Fragment() {
 
         if (rawRestaurantsFromArgs != null && rawRestaurantsFromArgs.isNotEmpty()) {
             val processedRestaurants = if (rawRestaurantsFromArgs.size > 10) {
-                Log.d("RouletteFragment", "Original list size: ${rawRestaurantsFromArgs.size}, taking first 10.")
                 rawRestaurantsFromArgs.take(10)
             } else {
-                Log.d("RouletteFragment", "Original list size: ${rawRestaurantsFromArgs.size}, using all.")
                 rawRestaurantsFromArgs
             }
             
@@ -59,12 +57,13 @@ class RouletteFragment : Fragment() {
             spinButton.isEnabled = true
             textViewCurrentSelection.text = "準備好了嗎？"
             rouletteWheelView.isVisible = true
+            textViewCurrentSelection.isVisible = true
         } else {
             this.restaurantsForRouletteLogic = emptyList()
             spinButton.isEnabled = false
             textViewCurrentSelection.text = "輪盤資料為空"
             rouletteWheelView.isVisible = false
-            Log.w("RouletteFragment", "No restaurants passed for roulette.")
+            textViewCurrentSelection.isVisible = true
             Toast.makeText(context, "輪盤資料為空，請先從 Lazy Mode 產生 AI 推薦。", Toast.LENGTH_LONG).show()
         }
 
@@ -77,12 +76,11 @@ class RouletteFragment : Fragment() {
     private fun setupClickListeners() {
         spinButton.setOnClickListener {
             if (!spinButton.isEnabled || isSpinning) {
-                Toast.makeText(context, "輪盤目前無法使用或正在旋轉中。", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             isSpinning = true
             textViewCurrentSelection.text = "轉動中..."
-            // REMOVED: Toast.makeText(context, "輪盤旋轉中...", Toast.LENGTH_SHORT).show()
+            textViewCurrentSelection.isVisible = true
             spinButton.isEnabled = false
             viewModel.pickRestaurantForSpin()
         }
@@ -90,7 +88,6 @@ class RouletteFragment : Fragment() {
         rouletteWheelView.onResultListener = { selectedRestaurantName ->
             isSpinning = false
             textViewCurrentSelection.text = "選中了： $selectedRestaurantName"
-            // REMOVED: Toast.makeText(context, "選中了： $selectedRestaurantName", Toast.LENGTH_SHORT).show()
             if (restaurantsForRouletteLogic?.isNotEmpty() == true) {
                  spinButton.isEnabled = true
             }
@@ -111,11 +108,9 @@ class RouletteFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.targetRestaurantForSpin.observe(viewLifecycleOwner) { pair ->
             pair?.let { (index, restaurant) ->
-                Log.d("RouletteFragment", "ViewModel wants to spin to: ${restaurant.name} at index $index")
                 if (isSpinning && !spinButton.isEnabled && index < (restaurantsForRouletteLogic?.size ?: 0)) {
                      rouletteWheelView.spinToTarget(index)
                 } else if (isSpinning && !spinButton.isEnabled) {
-                    Log.e("RouletteFragment", "ViewModel target index $index is out of bounds for wheel items ${restaurantsForRouletteLogic?.size ?: 0}.")
                     isSpinning = false
                     spinButton.isEnabled = true
                     textViewCurrentSelection.text = "出現錯誤，請重試"
@@ -127,7 +122,6 @@ class RouletteFragment : Fragment() {
         viewModel.navigateToDetails.observe(viewLifecycleOwner) { restaurant ->
             restaurant?.let { selectedRestaurant ->
                 val actualSelectedRestaurant = restaurantsForRouletteLogic?.find { it.id == selectedRestaurant.id } ?: selectedRestaurant
-                Log.d("RouletteFragment", "Navigating to details for: ${actualSelectedRestaurant.name}, ID: ${actualSelectedRestaurant.id}")
                 val action = RouletteFragmentDirections.actionRouletteFragmentToRestaurantDetailsFragment(
                     restaurantId = actualSelectedRestaurant.id,
                     selectedRestaurantFull = actualSelectedRestaurant,

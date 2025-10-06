@@ -1,21 +1,46 @@
 package com.fatefulsupper.app.api
 
+import com.fatefulsupper.app.data.model.ApiResponse
 import com.fatefulsupper.app.data.model.UpdateBlacklistRequest
+import retrofit2.Call
 import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
-import retrofit2.http.Body
+import retrofit2.http.Query
 
-interface ApiService {
+interface FatefulApiService {
 
-    @PUT("members/{userId}/blacks/batch") // 假設後端會新增一個 '/batch' 端點來處理批次更新
+    @POST("login")
+    fun login(@Query("userid") userid: String, @Query("password") password: String): Call<Map<String, Any>>
+
+    @FormUrlEncoded
+    @POST("register")
+    fun register(
+        @Field("userid") userid: String,
+        @Field("password") password: String,
+        @Field("email") email: String,
+        @Field("username") username: String,
+        @Field("role") role: String
+    ): Call<Map<String, Any>>
+
+    @PUT("members/{userId}/blacks/batch")
     suspend fun updateBlacklist(
         @Path("userId") userId: String,
         @Body request: UpdateBlacklistRequest
-    ): Response<Void> // 假設後端成功後只返回 200 OK，沒有特定的響應體
+    ): Response<Void>
 
-    // 你也可以在這裡加入獲取黑名單的 GET 方法，例如：
-    // @GET("members/{userId}/blacks")
-    // suspend fun getBlacklist(@Path("userId") userId: String): Response<List<FoodCategory>>
-    // 但你需要先定義 FoodCategory 這個資料模型
+    @POST("/api/verifyEmailCode")
+    suspend fun verifyEmailCode(
+        @Query("userid") userid: String,
+        @Query("code") code: String
+    ): Response<ApiResponse>
+
+    @POST("/api/resendEmailCode")
+    suspend fun resendEmailCode(
+        @Query("userid") userid: String
+    ): Response<ApiResponse>
 }
