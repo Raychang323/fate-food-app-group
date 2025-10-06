@@ -53,6 +53,11 @@ class ConnoisseurCheckFragment : Fragment() {
              findNavController().navigate(R.id.action_connoisseurCheckFragment_to_luckyMealFragment)
         }
 
+        binding.buttonToQuickMode.setOnClickListener {
+            Log.d(TAG, "Quick Mode button clicked. Navigating to LoadingFragment.")
+            findNavController().navigate(R.id.action_connoisseurCheckFragment_to_loadingFragment)
+        }
+
         // Logic for Test Notification Button
         if (BuildConfig.DEBUG) {
             binding.buttonTestNotification.visibility = View.VISIBLE

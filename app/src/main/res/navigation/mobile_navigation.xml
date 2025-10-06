@@ -23,6 +23,14 @@
         <action
             android:id="@+id/action_connoisseurCheckFragment_to_luckyMealFragment"
             app:destination="@id/luckyMealFragment" />
+        <action
+            android:id="@+id/action_connoisseurCheckFragment_to_loadingFragment"
+            app:destination="@id/loadingFragment">
+            <argument
+                android:name="sourceFragment"
+                app:argType="string"
+                android:defaultValue="quickMode" />
+        </action>
     </fragment>
 
     <fragment
@@ -86,7 +94,12 @@
         <!-- Old actions to RestaurantList and Roulette are removed -->
         <action
             android:id="@+id/action_lazyModeFragment_to_loadingFragment"
-            app:destination="@id/loadingFragment" />
+            app:destination="@id/loadingFragment">
+            <argument
+                android:name="sourceFragment"
+                app:argType="string"
+                android:defaultValue="lazyMode" />
+        </action>
     </fragment>
 
     <!-- +++++++++++++ NEW FRAGMENTS AND ACTIONS START HERE +++++++++++++ -->
@@ -95,11 +108,20 @@
         android:name="com.fatefulsupper.app.ui.main.LoadingFragment"
         android:label="LoadingFragment"
         tools:layout="@layout/fragment_loading">
+        <argument
+            android:name="sourceFragment"
+            app:argType="string"
+            android:defaultValue="unknown" />
         <action
             android:id="@+id/action_loadingFragment_to_actionChoiceFragment"
             app:destination="@id/actionChoiceFragment"
             app:popUpTo="@id/loadingFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_loadingFragment_to_restaurantListFragment"
+            app:destination="@id/restaurantListFragment"
+            app:popUpTo="@id/connoisseurCheckFragment"
+            app:popUpToInclusive="false" /> <!-- MODIFIED HERE -->
     </fragment>
 
     <fragment
