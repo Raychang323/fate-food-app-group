@@ -55,6 +55,9 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.glide) // Changed to use version catalog
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp.logging.interceptor)
 
 // 如果您在Kotlin專案中使用了Glide的註解處理器 (通常不需要，除非有特定Generated API需求)
 // kapt("com.github.bumptech.glide:compiler:4.16.0")
