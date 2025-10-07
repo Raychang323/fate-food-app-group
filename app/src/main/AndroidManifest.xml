@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
+        android:name=".MainApplication"
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -34,12 +35,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- 登入頁 -->
-        <activity android:name=".LoginActivity" android:exported="false" />
-
-        <!-- 註冊頁 -->
-        <activity android:name=".RegisterActivity" android:exported="false" />
 
         <receiver
             android:name=".receiver.NotificationReceiver"

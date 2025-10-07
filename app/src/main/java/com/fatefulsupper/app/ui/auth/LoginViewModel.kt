@@ -1,85 +1,64 @@
 package com.fatefulsupper.app.ui.auth
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fatefulsupper.app.api.RetrofitClient
+import com.fatefulsupper.app.data.model.request.LoginRequest
+import com.fatefulsupper.app.data.repository.AuthRepository
 import com.fatefulsupper.app.util.Event
+import com.fatefulsupper.app.util.SessionManager
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import org.json.JSONObject
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _isLoading = MutableLiveData<Boolean>()
+    private val authRepository = AuthRepository()
+
+    private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
-    private val _loginResult = MutableLiveData<Boolean>()
-    val loginResult: LiveData<Boolean> = _loginResult
+    private val _loginSuccess = MutableLiveData<Event<String>>()
+    val loginSuccess: LiveData<Event<String>> = _loginSuccess
 
-    private val _loginError = MutableLiveData<String?>()
-    val loginError: LiveData<String?> = _loginError
+    private val _loginError = MutableLiveData<Event<String>>()
+    val loginError: LiveData<Event<String>> = _loginError
 
-    private val _snackbarMessage = MutableLiveData<Event<String>>()
-    val snackbarMessage: LiveData<Event<String>> = _snackbarMessage
-
-    private val apiService = RetrofitClient.apiService
-
-    fun login(usernameOrEmail: String, password: String) {
-        _isLoading.value = true
-        _loginError.value = null
-
-        val call = apiService.login(usernameOrEmail, password)
-
-        call.enqueue(object : Callback<Map<String, Any>> {
-            override fun onResponse(
-                call: Call<Map<String, Any>>,
-                response: Response<Map<String, Any>>
-            ) {
-                _isLoading.value = false
-
-                try {
-                    val result = response.body()
-                    if (response.isSuccessful && result != null) {
-                        if (result["status"] == "ok") {
-                            val username = result["username"]?.toString() ?: ""
-                            _snackbarMessage.value = Event("歡迎 $username")
-                            _loginResult.value = true
-                        } else {
-                            _loginError.value = result["message"]?.toString() ?: "登入失敗"
-                            _loginResult.value = false
+    fun login(userid: String, password: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val request = LoginRequest(userid, password)
+                val response = authRepository.login(request)
+                if (response.isSuccessful) {
+                    val authResponse = response.body()
+                    if (authResponse != null) {
+                        // Login successful, save the token
+                        SessionManager.saveAuthToken(getApplication(), authResponse.token)
+                        _loginSuccess.postValue(Event("登入成功"))
+                    } else {
+                        _loginError.postValue(Event("登入失敗"))
+                    }
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    if (errorBody != null) {
+                        try {
+                            val json = JSONObject(errorBody)
+                            val message = json.getString("message")
+                            _loginError.postValue(Event("登入失敗: $message"))
+                        } catch (e: Exception) {
+                            _loginError.postValue(Event("登入失敗: ${response.code()} ${response.message()}"))
                         }
                     } else {
-                        val errorBody = response.errorBody()?.string()
-                        if (!errorBody.isNullOrEmpty()) {
-                            _loginError.value = "帳號或密碼錯誤"
-                        } else {
-                            _loginError.value = "帳號或密碼錯誤或伺服器回應錯誤"
-                        }
-                        _loginResult.value = false
+                        _loginError.postValue(Event("登入失敗: ${response.code()} ${response.message()}"))
                     }
-                } catch (e: Exception) {
-                    _loginError.value = "登入失敗: ${e.localizedMessage}"
-                    _loginResult.value = false
                 }
-            }
-
-            override fun onFailure(call: Call<Map<String, Any>?>, t: Throwable) {
+            } catch (e: Exception) {
+                _loginError.postValue(Event("登入失敗: ${e.localizedMessage}"))
+            } finally {
                 _isLoading.value = false
-                _loginError.value = "網路連線失敗，請稍後再試"
-                _loginResult.value = false
             }
-        })
-    }
-
-    fun onLoginAttemptComplete() {
-        _loginResult.value = false
-        _loginError.value = null
-    }
-
-    fun onNavigatedFromRegistrationSuccess() {
-        _snackbarMessage.value = Event("註冊成功！請登入。")
+        }
     }
 }
