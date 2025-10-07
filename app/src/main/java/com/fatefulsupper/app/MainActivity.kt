@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -27,9 +28,11 @@ import androidx.navigation.ui.setupWithNavController
 import com.fatefulsupper.app.databinding.ActivityMainBinding
 import com.fatefulsupper.app.ui.dialog.NotificationSettingsDialog
 import com.fatefulsupper.app.ui.dialog.SupperBlacklistDialog
+import com.fatefulsupper.app.ui.settings.SettingsViewModel
 import com.fatefulsupper.app.util.NotificationHelper
 import com.fatefulsupper.app.util.NotificationScheduler
 import com.fatefulsupper.app.util.SetupConstants
+import com.fatefulsupper.app.util.TokenManager
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity(),
@@ -42,6 +45,7 @@ class MainActivity : AppCompatActivity(),
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var drawerLayout: DrawerLayout
 
+    private val settingsViewModel: SettingsViewModel by viewModels()
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
     companion object {
@@ -51,24 +55,19 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-                if (!::sharedPreferences.isInitialized) {
-                    sharedPreferences = getSharedPreferences(SetupConstants.PREFS_NAME, MODE_PRIVATE)
-                }
-                if (isGranted) {
-                    if (sharedPreferences.getBoolean(SetupConstants.KEY_FIRST_TIME_SETUP_COMPLETED, false)) {
-                        NotificationScheduler.scheduleNotifications(this)
-                    }
-                } else {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.notification_permission_denied_message),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    NotificationScheduler.cancelScheduledNotifications(this)
-                }
+        requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (!::sharedPreferences.isInitialized) {
+                sharedPreferences = getSharedPreferences(SetupConstants.PREFS_NAME, MODE_PRIVATE)
             }
+            if (isGranted) {
+                if (sharedPreferences.getBoolean(SetupConstants.KEY_FIRST_TIME_SETUP_COMPLETED, false)) {
+                    NotificationScheduler.scheduleNotifications(this)
+                }
+            } else {
+                Toast.makeText(this, getString(R.string.notification_permission_denied_message), Toast.LENGTH_LONG).show()
+                NotificationScheduler.cancelScheduledNotifications(this)
+            }
+        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -79,21 +78,12 @@ class MainActivity : AppCompatActivity(),
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
 
-        appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.connoisseurCheckFragment, R.id.lazyModeFragment),
-            drawerLayout
-        )
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.connoisseurCheckFragment), drawerLayout)
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        toggle = ActionBarDrawerToggle(
-            this,
-            drawerLayout,
-            binding.appBarMain.toolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
+        toggle = ActionBarDrawerToggle(this, drawerLayout, binding.appBarMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawerLayout.addDrawerListener(toggle)
 
         binding.appBarMain.toolbar.setNavigationOnClickListener {
@@ -135,13 +125,23 @@ class MainActivity : AppCompatActivity(),
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED &&
                 !shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                Handler(Looper.getMainLooper()).postDelayed({
-                    checkAndLaunchFirstTimeSetup()
-                }, 1000)
+                Handler(Looper.getMainLooper()).postDelayed({ checkAndLaunchFirstTimeSetup() }, 1000)
             } else {
                 checkAndLaunchFirstTimeSetup()
             }
         }
+    }
+    
+    fun handleLoginSuccess(userId: String, token: String) {
+        // 1. Save the token
+        val tokenManager = TokenManager(this)
+        tokenManager.saveToken(token)
+
+        // 2. Sync the blacklist
+        settingsViewModel.syncBlacklistOnLogin(userId, sharedPreferences)
+
+        // 3. Update UI
+        updateNavHeader(userId)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -228,10 +228,12 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onBlacklistSettingsSaved(blacklistedTypes: Set<String>) {
-        // Handled in SettingsFragment
+        // This is now handled by the SettingsViewModel
+        val userId = "test_user_id" // TODO: Replace with actual user ID
+        settingsViewModel.updateNightSnackBlacklist(userId, blacklistedTypes)
     }
 
     override fun onBlacklistSetupSkipped() {
-        // Handled in SettingsFragment
+        // Handled in SettingsFragment or other relevant places
     }
 }

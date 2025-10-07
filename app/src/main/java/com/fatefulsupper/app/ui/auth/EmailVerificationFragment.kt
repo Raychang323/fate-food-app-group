@@ -40,7 +40,7 @@ class EmailVerificationFragment : Fragment() {
         errorTextView = view.findViewById(R.id.textView_verification_error)
 
         // Initialize ViewModel with the factory
-        val factory = EmailVerificationViewModelFactory(userid)
+        val factory = EmailVerificationViewModelFactory(requireActivity().application, userid)
         viewModel = ViewModelProvider(this, factory).get(EmailVerificationViewModel::class.java)
 
         // Setup UI

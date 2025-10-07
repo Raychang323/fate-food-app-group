@@ -1,8 +1,9 @@
 package com.fatefulsupper.app.ui.auth
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fatefulsupper.app.api.RetrofitClient
 import com.fatefulsupper.app.data.model.ApiResponse
@@ -12,7 +13,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-class EmailVerificationViewModel(private val userid: String) : ViewModel() {
+class EmailVerificationViewModel(application: Application, private val userid: String) : AndroidViewModel(application) {
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -32,7 +33,7 @@ class EmailVerificationViewModel(private val userid: String) : ViewModel() {
     private var cooldownJob: Job? = null
     private val COOLDOWN_TIME_SECONDS = 60
 
-    private val api = RetrofitClient.apiService
+    private val api = RetrofitClient.getInstance(application)
 
     fun verifyCode(code: String) {
         _isLoading.value = true

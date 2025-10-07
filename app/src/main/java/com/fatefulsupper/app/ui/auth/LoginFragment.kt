@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.fatefulsupper.app.MainActivity
 import com.fatefulsupper.app.R
 import com.fatefulsupper.app.util.NotificationScheduler
 import com.google.android.material.snackbar.Snackbar
@@ -57,8 +58,9 @@ class LoginFragment : Fragment() {
         }
 
         viewModel.loginSuccess.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { message ->
-                Snackbar.make(requireView(), message, Snackbar.LENGTH_LONG).show()
+            event.getContentIfNotHandled()?.let { (userId, token) ->
+                (activity as? MainActivity)?.handleLoginSuccess(userId, token)
+                Snackbar.make(requireView(), "登入成功", Snackbar.LENGTH_LONG).show()
                 NotificationScheduler.checkLocationServices(requireActivity())
                 findNavController().navigate(R.id.action_loginFragment_to_lazyModeFragment)
             }
