@@ -7,6 +7,7 @@ appcompat = "1.6.1"
 material = "1.10.0"
 constraintlayout = "2.1.4"
 androidxPreference = "1.2.1" # 或您選擇的其他版本
+playServicesLocation = "21.3.0"
 
 # 測試
 junit = "4.13.2"
@@ -40,6 +41,8 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "androidxPreference" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" } # 來自 HEAD
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+
 
 # Jetpack Architecture
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }

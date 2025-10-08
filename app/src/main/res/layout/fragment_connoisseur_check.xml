@@ -22,17 +22,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="我是饕客 (登入)"
-        app:layout_constraintTop_toBottomOf="@id/textView_connoisseur_title"
+        app:layout_constraintTop_toBottomOf="@+id/textView_connoisseur_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp"/>
+
+    <Button
+        android:id="@+id/button_logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="登出 (測試用)"
+        app:layout_constraintTop_toBottomOf="@id/button_to_login"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
 
     <Button
         android:id="@+id/button_to_register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="我想成為饕客 (註冊)"
-        app:layout_constraintTop_toBottomOf="@id/button_to_login"
+        app:layout_constraintTop_toBottomOf="@+id/button_logout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
@@ -42,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="我是訪客 (懶人模式)"
-        app:layout_constraintTop_toBottomOf="@id/button_to_register"
+        app:layout_constraintTop_toBottomOf="@+id/button_to_register"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
@@ -52,7 +62,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="每日幸運餐"
-        app:layout_constraintTop_toBottomOf="@id/button_to_lazy_mode"
+        app:layout_constraintTop_toBottomOf="@+id/button_to_lazy_mode"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
@@ -62,7 +72,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="快速模式"
-        app:layout_constraintTop_toBottomOf="@id/button_to_lucky_meal"
+        app:layout_constraintTop_toBottomOf="@+id/button_to_lucky_meal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
@@ -73,7 +83,7 @@
         android:layout_height="wrap_content"
         android:text="Test Notification (15s)"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/button_to_lucky_meal"
+        app:layout_constraintTop_toBottomOf="@+id/button_to_quick_mode"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>

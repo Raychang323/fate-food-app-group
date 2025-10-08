@@ -1,8 +1,9 @@
 package com.fatefulsupper.app.ui.auth
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fatefulsupper.app.data.model.request.RegisterRequest
 import com.fatefulsupper.app.data.repository.AuthRepository
@@ -10,9 +11,9 @@ import com.fatefulsupper.app.util.Event
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val authRepository = AuthRepository()
+    private val authRepository = AuthRepository(application)
 
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading

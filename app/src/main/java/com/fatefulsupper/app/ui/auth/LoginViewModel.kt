@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.fatefulsupper.app.api.RetrofitClient
 import com.fatefulsupper.app.util.Event
 import com.fatefulsupper.app.util.TokenManager
 import kotlinx.coroutines.launch
@@ -22,15 +21,19 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val _loginError = MutableLiveData<Event<String>>()
     val loginError: LiveData<Event<String>> = _loginError
 
+    private val _logoutSuccess = MutableLiveData<Event<Unit>>()
+    val logoutSuccess: LiveData<Event<Unit>> = _logoutSuccess
+
     fun login(userid: String, password: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val response = RetrofitClient.getInstance(getApplication()).login(userid, password).execute()
+                val response = com.fatefulsupper.app.api.RetrofitClient.getInstance(getApplication()).login(userid, password).execute()
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     val token = responseBody?.get("token") as? String
                     if (token != null) {
+                        TokenManager(getApplication()).saveToken(token)
                         _loginSuccess.postValue(Event(Pair(userid, token)))
                     } else {
                         _loginError.postValue(Event("登入失敗: 無法取得 token"))
@@ -55,5 +58,10 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 _isLoading.value = false
             }
         }
+    }
+
+    fun logout() {
+        TokenManager(getApplication()).clearToken()
+        _logoutSuccess.postValue(Event(Unit))
     }
 }

@@ -1,13 +1,14 @@
 package com.fatefulsupper.app.data.repository
 
+import android.content.Context
+import com.fatefulsupper.app.api.RetrofitClient
 import com.fatefulsupper.app.data.model.request.LoginRequest
 import com.fatefulsupper.app.data.model.request.RegisterRequest
 import com.fatefulsupper.app.service.AuthService
-import com.fatefulsupper.app.service.RetrofitClient
 
-class AuthRepository {
+class AuthRepository(context: Context) {
 
-    private val authService: AuthService = RetrofitClient.instance.create(AuthService::class.java)
+    private val authService: AuthService = RetrofitClient.getInstance(context).create(AuthService::class.java)
 
     suspend fun register(request: RegisterRequest) = authService.register(request)
 

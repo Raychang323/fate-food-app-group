@@ -12,13 +12,13 @@ object RetrofitClient {
 
     private const val BASE_URL = "http://10.0.2.2:8080/api/"
     @Volatile
-    private var INSTANCE: FatefulApiService? = null
+    private var INSTANCE: Retrofit? = null
 
-    fun getInstance(context: Context): FatefulApiService = INSTANCE ?: synchronized(this) {
-        INSTANCE ?: buildApiService(context).also { INSTANCE = it }
+    fun getInstance(context: Context): Retrofit = INSTANCE ?: synchronized(this) {
+        INSTANCE ?: buildRetrofit(context).also { INSTANCE = it }
     }
 
-    private fun buildApiService(context: Context): FatefulApiService {
+    private fun buildRetrofit(context: Context): Retrofit {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -34,12 +34,10 @@ object RetrofitClient {
         val gson = GsonBuilder()
             .create()
 
-        val retrofit = Retrofit.Builder()
+        return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
-
-        return retrofit.create(FatefulApiService::class.java)
     }
 }
