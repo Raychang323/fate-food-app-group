@@ -36,9 +36,9 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.material.card.MaterialCardView
 
-class LazyModeFragment : Fragment(), View.OnTouchListener {
+class FoodieModeFragment : Fragment(), View.OnTouchListener {
 
-    private lateinit var viewModel: LazyModeViewModel
+    private lateinit var viewModel: FoodieModeViewModel
 
     private lateinit var foodCardView: MaterialCardView
     private lateinit var foodImageView: ImageView
@@ -67,7 +67,7 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
     private var rationaleShownThisSession = false
     private var permissionRequestAttemptedThisSession = false
 
-    private val TAG = "LazyModeFragment"
+    private val tag = "FoodieModeFragment"
     private var moodSelectionCompletedThisSession = false
 
     companion object {
@@ -106,8 +106,8 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view = inflater.inflate(R.layout.fragment_lazy_mode, container, false)
-        viewModel = ViewModelProvider(this)[LazyModeViewModel::class.java]
+        val view = inflater.inflate(R.layout.fragment_foodie_mode, container, false)
+        viewModel = ViewModelProvider(this)[FoodieModeViewModel::class.java]
 
         foodCardView = view.findViewById(R.id.cardView_food_item)
         foodImageView = view.findViewById(R.id.imageView_food_card_placeholder)
@@ -190,7 +190,7 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
         requestLocationPermissions()
 
         if (viewModel.navigationHasBeenHandled.value == true) {
-            viewModel.resetLazyModeState()
+            viewModel.resetFoodieModeState()
         } else {
             updateUiForCurrentState()
         }
@@ -210,7 +210,7 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
         }
         getRecommendationsButton.setOnClickListener {
             if (lastGeneratedRestaurants != null && lastGeneratedRestaurants!!.isNotEmpty()) {
-                val action = LazyModeFragmentDirections.actionLazyModeFragmentToRestaurantListFragment(
+                val action = FoodieModeFragmentDirections.actionFoodieModeFragmentToRestaurantListFragment(
                     listFilterType = "ai_generated",
                     likedRestaurantIds = null,
                     aiGeneratedRestaurants = lastGeneratedRestaurants!!.toTypedArray()
@@ -222,7 +222,7 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
         }
         buttonGoToRoulette.setOnClickListener {
             if (lastGeneratedRestaurants != null && lastGeneratedRestaurants!!.isNotEmpty()) {
-                val action = LazyModeFragmentDirections.actionLazyModeFragmentToRouletteFragment(
+                val action = FoodieModeFragmentDirections.actionFoodieModeFragmentToRouletteFragment(
                     restaurantsForRoulette = lastGeneratedRestaurants!!.toTypedArray()
                 )
                 findNavController().navigate(action)
@@ -255,7 +255,6 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
             foodCardView.rotation = 0f
 
             val isCompletionActive = viewModel.showCompletionMessage.value == true
-            val shouldShowQuadrant = isCompletionActive && !moodSelectionCompletedThisSession
 
             if (foodTypeCard != null && !isCompletionActive) {
                 updateFoodTypeCardUI(foodTypeCard)
@@ -287,7 +286,7 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
                         quadrantViewMoodHunger.isVisible = true
                     } else {
                         quadrantViewMoodHunger.isVisible = false
-                        showRecommendationOptions("您已完成心情選擇，請查看推薦！")
+                        showRecommendationOptions(getString(R.string.mood_selection_completed_prompt))
                     }
                 } else {
                     quadrantViewMoodHunger.isVisible = false
@@ -307,7 +306,7 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
         viewModel.navigateToLoadingEvent.observe(viewLifecycleOwner) { event ->
             event.getContentIfNotHandled()?.let {
                 try {
-                    findNavController().navigate(R.id.action_lazyModeFragment_to_loadingFragment)
+                    findNavController().navigate(R.id.action_foodieModeFragment_to_loadingFragment)
                 } catch (e: Exception) {
                     Toast.makeText(requireContext(), getString(R.string.toast_navigation_to_loading_failed), Toast.LENGTH_SHORT).show()
                 }
@@ -316,7 +315,7 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
 
         viewModel.foodTypePreferencesCollected.observe(viewLifecycleOwner) { preferences ->
             if (preferences != null && preferences.isNotEmpty()) {
-                Log.d(TAG, "Food type preferences collected: ${preferences.size} items.")
+                Log.d(tag, "Food type preferences collected: ${preferences.size} items.")
             }
         }
     }
@@ -341,37 +340,76 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun updateUiForCurrentState() {
-        val currentCard = viewModel.currentFoodTypeCard.value
-        val showCompletionMessage = viewModel.showCompletionMessage.value ?: false
+    val currentCard = viewModel.currentFoodTypeCard.value
+    val showCompletionMessage = viewModel.showCompletionMessage.value ?: false
 
-        if (currentCard != null && !showCompletionMessage) {
-            foodCardView.isVisible = true
-            likeButton.isVisible = true
-            dislikeButton.isVisible = true
-            quadrantViewMoodHunger.isVisible = false
-            textViewStatusMessage.isVisible = false
-            foodNameTextView.text = currentCard.name
-            foodDescriptionTextView.text = currentCard.description
-            if (currentCard.imageResId != 0 && currentCard.imageResId != -1) {
-                foodImageView.setImageResource(currentCard.imageResId)
-            } else {
-                foodImageView.setImageDrawable(null)
-            }
-        } else {
-            foodCardView.isVisible = false
-            likeButton.isVisible = false
-            dislikeButton.isVisible = false
-            quadrantViewMoodHunger.isVisible = true
-            textViewStatusMessage.isVisible = true
-            if (viewModel.masterFoodItemsList.isEmpty() || (viewModel.foodTypeCards.isEmpty() && viewModel.showCompletionMessage.value == true)) {
-                textViewStatusMessage.text = getString(R.string.lazy_mode_no_cards_available_prompt)
-            } else if (showCompletionMessage) {
-                textViewStatusMessage.text = getString(R.string.lazy_mode_completion_message_mood_prompt)
-            } else {
-                textViewStatusMessage.text = getString(R.string.lazy_mode_initial_prompt_mood_hunger)
-            }
-        }
+    // 基本前提：如果沒有任何卡片，則直接顯示無卡片狀態
+    if (viewModel.masterFoodItemsList.isEmpty() || (viewModel.foodTypeCards.isEmpty() && !showCompletionMessage)) {
+        showNoCardsState()
+        return
     }
+
+    // 狀態1: 仍在刷卡
+    if (currentCard != null && !showCompletionMessage) {
+        showCardSwipingState(currentCard)
+    }
+    // 狀態 2: 刷卡結束，準備進行心情選擇
+    else if (showCompletionMessage) {
+        showMoodSelectionState()
+    }
+    // 其他過渡狀態 (例如，ViewModel 初始化中)
+    else {
+        showInitialLoadingState()
+    }
+}
+
+private fun showNoCardsState() {
+    foodCardView.isVisible = false
+    likeButton.isVisible = false
+    dislikeButton.isVisible = false
+    quadrantViewMoodHunger.isVisible = false
+    noMoreCardsContainer.isVisible = false
+    textViewStatusMessage.isVisible = true
+    textViewStatusMessage.text = getString(R.string.foodie_mode_no_cards_available_prompt)
+}
+
+private fun showCardSwipingState(currentCard: FoodTypeCard) {
+    foodCardView.isVisible = true
+    likeButton.isVisible = true
+    dislikeButton.isVisible = true
+    quadrantViewMoodHunger.isVisible = false
+    noMoreCardsContainer.isVisible = false
+    textViewStatusMessage.isVisible = false
+
+    updateFoodTypeCardUI(currentCard)
+}
+
+private fun showMoodSelectionState() {
+    foodCardView.isVisible = false
+    likeButton.isVisible = false
+    dislikeButton.isVisible = false
+    
+    if (!moodSelectionCompletedThisSession) {
+        quadrantViewMoodHunger.isVisible = true
+        noMoreCardsContainer.isVisible = false
+        textViewStatusMessage.isVisible = true
+        textViewStatusMessage.text = getString(R.string.foodie_mode_completion_message_mood_prompt)
+    } else {
+        quadrantViewMoodHunger.isVisible = false
+        showRecommendationOptions(getString(R.string.mood_selection_completed_prompt))
+    }
+}
+
+private fun showInitialLoadingState() {
+    foodCardView.isVisible = false
+    likeButton.isVisible = false
+    dislikeButton.isVisible = false
+    quadrantViewMoodHunger.isVisible = false
+    noMoreCardsContainer.isVisible = false
+    textViewStatusMessage.isVisible = true
+    textViewStatusMessage.text = getString(R.string.foodie_mode_initial_prompt_mood_hunger) 
+}
+
 
     private fun showRecommendationOptions(message: String) {
         noMoreCardsContainer.isVisible = true
@@ -392,7 +430,7 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
         for (i in 1..baseCount) {
             restaurants.add(
                 Restaurant(
-                    id = "llama_res_lazy_mood_$i",
+                    id = "llama_res_foodie_mood_$i",
                     name = "AI推薦餐廳 #$i (基於心情)",
                     photoUrl = "https://picsum.photos/seed/restaurant_mood_$i/300/200",
                     cuisine = if (i % 3 == 0) "特色川菜" else if (i % 3 == 1) "創意日料" else "溫馨義式",
@@ -411,7 +449,7 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
         foodDescriptionTextView.text = foodTypeCard.description
         try {
             foodImageView.setImageResource(foodTypeCard.imageResId)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             foodImageView.setImageResource(R.drawable.ic_menu_gallery)
         }
     }
@@ -420,7 +458,7 @@ class LazyModeFragment : Fragment(), View.OnTouchListener {
     private fun fetchDeviceLocation() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            return
         }
 
         val locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager?

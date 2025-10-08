@@ -62,7 +62,7 @@ class LoginFragment : Fragment() {
                 (activity as? MainActivity)?.handleLoginSuccess(userId, token)
                 Snackbar.make(requireView(), "登入成功", Snackbar.LENGTH_LONG).show()
                 NotificationScheduler.checkLocationServices(requireActivity())
-                findNavController().navigate(R.id.action_loginFragment_to_lazyModeFragment)
+                findNavController().navigate(R.id.action_loginFragment_to_foodieModeFragment)
             }
         }
 

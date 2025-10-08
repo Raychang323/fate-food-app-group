@@ -28,14 +28,14 @@
     <string name="dialog_blacklist_description">選擇您不希望看到的宵夜類型：</string>
     <string name="content_description_blacklist_scrollview">可滾動的宵夜類型黑名單選項</string>
 
-    <string name="lazy_mode_recommendations_ready">推薦結果已準備好，即將跳轉...</string>
-    <string name="lazy_mode_completion_message"> </string>
-    <string name="lazy_mode_action_prompt">推薦已生成，請選擇下一步：</string>
-    <string name="lazy_mode_initial_prompt">請點擊四象限圖開始推薦！</string>
+    <string name="foodie_mode_recommendations_ready">推薦結果已準備好，即將跳轉...</string>
+    <string name="foodie_mode_action_prompt">推薦已生成，請選擇下一步：</string>
+    <string name="foodie_mode_initial_prompt">請點擊四象限圖開始推薦！</string>
 
-    <string name="lazy_mode_no_cards_available_prompt">目前沒有符合的宵夜卡片\n請調整您的黑名單或稍後嘗試！</string>
-    <string name="lazy_mode_completion_message_mood_prompt">所有卡片已滑完！\n請選擇您的心情與飢餓程度以獲取推薦！</string>
-    <string name="lazy_mode_initial_prompt_mood_hunger">請選擇您的心情與飢餓程度，或滑動上方的卡片來表達您的偏好。</string>
+    <string name="foodie_mode_no_cards_available_prompt">目前沒有符合的宵夜卡片\n請調整您的黑名單或稍後嘗試！</string>
+    <string name="foodie_mode_completion_message_mood_prompt">所有卡片已滑完！\n請選擇您的心情與飢餓程度以獲取推薦！</string>
+    <string name="foodie_mode_initial_prompt_mood_hunger">請選擇您的心情與飢餓程度，或滑動上方的卡片來表達您的偏好。</string>
+    <string name="mood_selection_completed_prompt">您已完成心情選擇，請查看推薦！</string>
 
     <string name="toast_location_permission_not_granted">位置權限未授予。部分功能可能受限。</string>
     <string name="mood_happy">開心</string>

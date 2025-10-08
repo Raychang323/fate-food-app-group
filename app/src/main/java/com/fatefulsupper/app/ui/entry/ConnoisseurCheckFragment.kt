@@ -58,17 +58,18 @@ class ConnoisseurCheckFragment : Fragment() {
             findNavController().navigate(R.id.action_connoisseurCheckFragment_to_registerFragment)
         }
 
-        binding.buttonToLazyMode.setOnClickListener {
-            findNavController().navigate(R.id.action_connoisseurCheckFragment_to_lazyModeFragment)
+        binding.buttonToFoodieMode.setOnClickListener {
+            findNavController().navigate(R.id.action_connoisseurCheckFragment_to_foodieModeFragment)
         }
 
         binding.buttonToLuckyMeal.setOnClickListener {
              findNavController().navigate(R.id.action_connoisseurCheckFragment_to_luckyMealFragment)
         }
 
-        binding.buttonToQuickMode.setOnClickListener {
-            Log.d(TAG, "Quick Mode button clicked. Navigating to LoadingFragment.")
-            findNavController().navigate(R.id.action_connoisseurCheckFragment_to_loadingFragment)
+        binding.buttonToGuestMode.setOnClickListener {
+            Log.d(TAG, "Guest Mode button clicked. Navigating to LoadingFragment.")
+            val action = ConnoisseurCheckFragmentDirections.actionConnoisseurCheckFragmentToLoadingFragment("guestMode")
+            findNavController().navigate(action)
         }
 
         // Logic for Test Notification Button

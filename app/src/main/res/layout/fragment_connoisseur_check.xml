@@ -48,10 +48,10 @@
         android:layout_marginTop="16dp"/>
 
     <Button
-        android:id="@+id/button_to_lazy_mode"
+        android:id="@+id/button_to_foodie_mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="我是訪客 (懶人模式)"
+        android:text="我是食客 (美食探索)"
         app:layout_constraintTop_toBottomOf="@+id/button_to_register"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -62,16 +62,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="每日幸運餐"
-        app:layout_constraintTop_toBottomOf="@+id/button_to_lazy_mode"
+        app:layout_constraintTop_toBottomOf="@+id/button_to_foodie_mode"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
 
     <Button
-        android:id="@+id/button_to_quick_mode"
+        android:id="@+id/button_to_guest_mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="快速模式"
+        android:text="我是訪客 (快速模式)"
         app:layout_constraintTop_toBottomOf="@+id/button_to_lucky_meal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -83,7 +83,7 @@
         android:layout_height="wrap_content"
         android:text="Test Notification (15s)"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/button_to_quick_mode"
+        app:layout_constraintTop_toBottomOf="@+id/button_to_guest_mode"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>

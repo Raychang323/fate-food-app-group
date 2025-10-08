@@ -14,8 +14,8 @@
             android:id="@+id/action_connoisseurCheckFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
         <action
-            android:id="@+id/action_connoisseurCheckFragment_to_lazyModeFragment"
-            app:destination="@id/lazyModeFragment"
+            android:id="@+id/action_connoisseurCheckFragment_to_foodieModeFragment"
+            app:destination="@id/foodieModeFragment"
             app:popUpTo="@id/connoisseurCheckFragment"
             app:popUpToInclusive="false" />
         <action
@@ -43,8 +43,8 @@
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
         <action
-            android:id="@+id/action_loginFragment_to_lazyModeFragment"
-            app:destination="@id/lazyModeFragment"
+            android:id="@+id/action_loginFragment_to_foodieModeFragment"
+            app:destination="@id/foodieModeFragment"
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true"
             app:popUpToSaveState="false" />
@@ -75,8 +75,8 @@
         android:label="EmailVerificationFragment"
         tools:layout="@layout/fragment_email_verification">
         <action
-            android:id="@+id/action_emailVerificationFragment_to_lazyModeFragment"
-            app:destination="@id/lazyModeFragment"
+            android:id="@+id/action_emailVerificationFragment_to_foodieModeFragment"
+            app:destination="@id/foodieModeFragment"
             app:popUpTo="@id/emailVerificationFragment"
             app:popUpToInclusive="true"/>
         <action
@@ -92,23 +92,23 @@
     </fragment>
 
     <fragment
-        android:id="@+id/lazyModeFragment"
-        android:name="com.fatefulsupper.app.ui.main.LazyModeFragment"
-        android:label="LazyModeFragment"
-        tools:layout="@layout/fragment_lazy_mode">
+        android:id="@+id/foodieModeFragment"
+        android:name="com.fatefulsupper.app.ui.main.FoodieModeFragment"
+        android:label="FoodieModeFragment"
+        tools:layout="@layout/fragment_foodie_mode">
         <action
-            android:id="@+id/action_lazyModeFragment_to_loadingFragment"
+            android:id="@+id/action_foodieModeFragment_to_loadingFragment"
             app:destination="@id/loadingFragment">
             <argument
                 android:name="sourceFragment"
                 app:argType="string"
-                android:defaultValue="lazyMode" />
+                android:defaultValue="foodieMode" />
         </action>
         <action
-            android:id="@+id/action_lazyModeFragment_to_restaurantListFragment"
+            android:id="@+id/action_foodieModeFragment_to_restaurantListFragment"
             app:destination="@id/restaurantListFragment" />
         <action
-            android:id="@+id/action_lazyModeFragment_to_rouletteFragment"
+            android:id="@+id/action_foodieModeFragment_to_rouletteFragment"
             app:destination="@id/rouletteFragment">
             <argument
                 android:name="restaurantsForRoulette"

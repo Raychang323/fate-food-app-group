@@ -14,7 +14,7 @@ import com.fatefulsupper.app.data.model.Restaurant
 
 class ActionChoiceFragment : Fragment() {
 
-    private lateinit var viewModel: LazyModeViewModel
+    private lateinit var viewModel: FoodieModeViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -22,7 +22,7 @@ class ActionChoiceFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_action_choice, container, false)
 
-        viewModel = ViewModelProvider(requireActivity())[LazyModeViewModel::class.java]
+        viewModel = ViewModelProvider(requireActivity())[FoodieModeViewModel::class.java]
 
         val recommendationSummary: TextView = view.findViewById(R.id.textView_action_choice_prompt)
         val viewRecommendationsButton: Button = view.findViewById(R.id.button_go_to_restaurant_list_from_choice)
