@@ -32,10 +32,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 if (response.isSuccessful) {
                     val blacklistResponse = response.body()
                     if (blacklistResponse?.status == "success") {
-                        val remoteBlacklistKeys = blacklistResponse.data.blackCategories
+                        val remoteBlacklistKeys = blacklistResponse.data.black_categories
                             .map { it.categoryKey }
                             .toSet()
-                        
+
                         with(prefs.edit()) {
                             putStringSet(SetupConstants.KEY_BLACKLISTED_SUPPER_TYPES, remoteBlacklistKeys)
                             apply()

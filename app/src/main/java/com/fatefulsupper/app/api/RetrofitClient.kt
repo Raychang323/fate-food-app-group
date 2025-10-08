@@ -12,11 +12,12 @@ object RetrofitClient {
 
     private const val BASE_URL = "http://10.0.2.2:8080/api/"
     @Volatile
-    private var INSTANCE: Retrofit? = null
+    private var INSTANCE: FatefulApiService? = null
 
-    fun getInstance(context: Context): Retrofit = INSTANCE ?: synchronized(this) {
-        INSTANCE ?: buildRetrofit(context).also { INSTANCE = it }
-    }
+    fun getInstance(context: Context): FatefulApiService =
+        INSTANCE ?: synchronized(this) {
+            INSTANCE ?: buildRetrofit(context).create(FatefulApiService::class.java).also { INSTANCE = it }
+        }
 
     private fun buildRetrofit(context: Context): Retrofit {
         val loggingInterceptor = HttpLoggingInterceptor().apply {

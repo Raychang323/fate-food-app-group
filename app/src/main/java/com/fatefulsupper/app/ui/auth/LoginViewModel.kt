@@ -5,12 +5,16 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.fatefulsupper.app.data.model.request.LoginRequest
+import com.fatefulsupper.app.data.repository.AuthRepository
 import com.fatefulsupper.app.util.Event
 import com.fatefulsupper.app.util.TokenManager
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val authRepository = AuthRepository(application)
 
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
@@ -28,10 +32,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val response = com.fatefulsupper.app.api.RetrofitClient.getInstance(getApplication()).login(userid, password).execute()
+                val request = LoginRequest(userid = userid, password = password)
+                val response = authRepository.login(request)
+
                 if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    val token = responseBody?.get("token") as? String
+                    val authResponse = response.body()
+                    val token = authResponse?.token
                     if (token != null) {
                         TokenManager(getApplication()).saveToken(token)
                         _loginSuccess.postValue(Event(Pair(userid, token)))
