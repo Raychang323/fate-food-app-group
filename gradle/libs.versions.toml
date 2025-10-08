@@ -8,6 +8,7 @@ material = "1.10.0"
 constraintlayout = "2.1.4"
 androidxPreference = "1.2.1" # 或您選擇的其他版本
 playServicesLocation = "21.3.0"
+playServicesMaps = "18.2.0"
 
 # 測試
 junit = "4.13.2"
@@ -27,7 +28,7 @@ glide = "5.0.5"
 retrofit = "2.11.0"           # 來自 HEAD (網路)
 retrofit-gson = "2.11.0"      # 來自 HEAD (網路)
 okhttp-logging = "4.12.0"     # 來自 HEAD (網路)
-firebaseAppdistributionGradle = "5.1.1" # 來自 06563bc (Firebase)
+firebaseAppdistributionGradle = "5.1.1" # 來自 06563bc
 
 
 [libraries]
@@ -42,6 +43,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "androidxPreference" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" } # 來自 HEAD
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 
 
 # Jetpack Architecture

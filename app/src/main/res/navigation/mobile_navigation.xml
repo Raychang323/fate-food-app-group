@@ -32,6 +32,9 @@
                 app:argType="string"
                 android:defaultValue="quickMode" />
         </action>
+        <action
+            android:id="@+id/action_connoisseurCheckFragment_to_luckyFoodFragment"
+            app:destination="@id/luckyFoodFragment" />
     </fragment>
 
     <fragment
@@ -245,6 +248,12 @@
             android:name="destinationName"
             app:argType="string" />
     </fragment>
+
+    <fragment
+        android:id="@+id/luckyFoodFragment"
+        android:name="com.fatefulsupper.app.ui.luckyfood.LuckyFoodFragment"
+        android:label="LuckyFoodFragment"
+        tools:layout="@layout/fragment_lucky_food" />
 
     <fragment
         android:id="@+id/nav_settings"

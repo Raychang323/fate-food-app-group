@@ -7,6 +7,8 @@ import com.fatefulsupper.app.data.model.request.LoginRequest
 import com.fatefulsupper.app.data.model.request.RegisterRequest
 import com.fatefulsupper.app.data.model.response.AuthResponse
 import com.fatefulsupper.app.data.model.ApiResponse
+import com.fatefulsupper.app.data.model.request.LuckyFoodRequest
+import com.fatefulsupper.app.data.model.response.LuckyFoodResponse
 
 import retrofit2.Response
 import retrofit2.http.Body
@@ -72,4 +74,11 @@ interface FatefulApiService {
     suspend fun resendEmailCode(
         @Query("userid") userid: String
     ): Response<ApiResponse>
+
+    // 幸運食物
+    @POST("luckyfood/test/location")
+    suspend fun getMemberLuckyFood(@Body request: LuckyFoodRequest): Response<LuckyFoodResponse>
+
+    @POST("luckyfood/location")
+    suspend fun getGuestLuckyFood(@Body request: LuckyFoodRequest): Response<LuckyFoodResponse>
 }

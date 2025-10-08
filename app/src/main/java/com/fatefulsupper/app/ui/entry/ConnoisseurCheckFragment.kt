@@ -63,7 +63,7 @@ class ConnoisseurCheckFragment : Fragment() {
         }
 
         binding.buttonToLuckyMeal.setOnClickListener {
-             findNavController().navigate(R.id.action_connoisseurCheckFragment_to_luckyMealFragment)
+             findNavController().navigate(R.id.action_connoisseurCheckFragment_to_luckyFoodFragment)
         }
 
         binding.buttonToGuestMode.setOnClickListener {

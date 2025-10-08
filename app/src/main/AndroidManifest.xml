@@ -25,6 +25,10 @@
         android:enableOnBackInvokedCallback="true"
         tools:replace="android:theme">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyD3laLMrMtjppjLw5jvSYhR79pe-5P8BrE" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
