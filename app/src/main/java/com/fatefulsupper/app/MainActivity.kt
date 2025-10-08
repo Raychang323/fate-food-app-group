@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity(),
 
     private val settingsViewModel: SettingsViewModel by viewModels()
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var tokenManager: TokenManager
 
     companion object {
         private const val TAG = "MainActivity"
@@ -54,6 +55,8 @@ class MainActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        tokenManager = TokenManager(this) // Initialize TokenManager
 
         requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (!::sharedPreferences.isInitialized) {
@@ -108,14 +111,12 @@ class MainActivity : AppCompatActivity(),
         NotificationHelper.createNotificationChannel(this)
 
         sharedPreferences = getSharedPreferences(SetupConstants.PREFS_NAME, MODE_PRIVATE)
-        updateNavHeader()
+        updateNavHeader(tokenManager.getUserId() ?: "訪客")
 
         if (sharedPreferences.getBoolean(SetupConstants.KEY_FIRST_TIME_SETUP_COMPLETED, false)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                     NotificationScheduler.scheduleNotifications(this)
-                } else {
-                    checkAndRequestNotificationPermission()
                 }
             } else {
                 NotificationScheduler.scheduleNotifications(this)
@@ -133,14 +134,11 @@ class MainActivity : AppCompatActivity(),
     }
     
     fun handleLoginSuccess(userId: String, token: String) {
-        // 1. Save the token
-        val tokenManager = TokenManager(this)
         tokenManager.saveToken(token)
+        tokenManager.saveUserId(userId)
 
-        // 2. Sync the blacklist
         settingsViewModel.syncBlacklistOnLogin(userId, sharedPreferences)
 
-        // 3. Update UI
         updateNavHeader(userId)
     }
 
@@ -227,10 +225,14 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    override fun onBlacklistSettingsSaved(blacklistedTypes: Set<String>) {
-        // This is now handled by the SettingsViewModel
-        val userId = "test_user_id" // TODO: Replace with actual user ID
-        settingsViewModel.updateNightSnackBlacklist(userId, blacklistedTypes)
+    override fun onBlacklistSettingsSaved(blacklistedIds: Set<Int>) { // Changed type to Set<Int>
+        val userId = tokenManager.getUserId()
+        if (userId == null) {
+            Log.e(TAG, "User ID not found when saving blacklist settings.")
+            Toast.makeText(this, "User not logged in. Cannot save blacklist.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        settingsViewModel.updateNightSnackBlacklist(userId, blacklistedIds)
     }
 
     override fun onBlacklistSetupSkipped() {

@@ -19,30 +19,36 @@ object SetupConstants {
     // Supper Blacklist Key
     const val KEY_BLACKLISTED_SUPPER_TYPES = "blacklisted_supper_types"
 
+    // Data class to hold supper type information including an integer ID
+    data class SupperType(
+        val id: Int,
+        val displayName: String,
+        val typeKey: String
+    )
+
     // Supper Types for Blacklist (Display Name to API Key)
-    val SUPPER_TYPES_BLACKLIST_OPTIONS = mapOf(
-        "餐廳" to "restaurant",
-        "食品店" to "food_store",
-        "食物外送 (Food Delivery)" to "food_delivery",
-        "便利商店" to "convenience_store",
-        "美式餐廳" to "american_restaurant",
-        "亞洲餐廳" to "asian_restaurant",
-        "餐酒吧" to "bar_and_grill",
-        "燒烤餐廳" to "barbecue_restaurant",
-        "早餐店" to "breakfast_restaurant",
-        "中式餐廳" to "chinese_restaurant",
-        "熟食店" to "deli",
-        "美式簡餐館" to "diner",
-        "速食餐廳" to "fast_food_restaurant",
-        "漢堡店" to "hamburger_restaurant",
-        "義式餐廳" to "italian_restaurant",
-        "日式餐廳" to "japanese_restaurant",
-        "餐點外送 (Meal Delivery)" to "meal_delivery",
-        "外帶餐點" to "meal_takeaway",
-        "披薩店" to "pizza_restaurant",
-        "拉麵店" to "ramen_restaurant",
-        "海鮮餐廳" to "seafood_restaurant",
-        "全素餐廳 (Vegan)" to "vegan_restaurant",
-        "蛋奶素餐廳 (Vegetarian)" to "vegetarian_restaurant"
+    val SUPPER_TYPES_BLACKLIST_OPTIONS = listOf(
+        SupperType(1, "超商", "convenience_store"),
+        SupperType(2, "美式料理", "american_restaurant"),
+        SupperType(3, "亞洲料理", "asian_restaurant"),
+        SupperType(4, "串燒", "bar_and_grill"),
+        SupperType(5, "燒烤", "barbecue_restaurant"),
+        SupperType(6, "早餐店（包含燒餅油條、清粥小菜）", "breakfast_restaurant"),
+        SupperType(7, "中式料理（包含台式料理）", "chinese_restaurant"),
+        SupperType(8, "熟食", "deli"),
+        SupperType(9, "餐館", "diner"),
+        SupperType(10, "速食", "fast_food_restaurant"),
+        SupperType(11, "漢堡", "hamburger_restaurant"),
+        SupperType(12, "義式料理", "italian_restaurant"),
+        SupperType(13, "日式料理", "japanese_restaurant"),
+        SupperType(14, "披薩", "pizza_restaurant"),
+        SupperType(15, "拉麵", "ramen_restaurant"),
+        SupperType(16, "餐廳", "restaurant"),
+        SupperType(17, "海鮮", "seafood_restaurant"),
+        SupperType(18, "純素餐廳", "vegan_restaurant"),
+        SupperType(19, "素食餐廳", "vegetarian_restaurant"),
+        SupperType(20, "食物外送", "food_delivery"),
+        SupperType(21, "外帶餐點", "meal_takeaway"),
+        SupperType(22, "餐點外送", "meal_delivery")
     )
 }

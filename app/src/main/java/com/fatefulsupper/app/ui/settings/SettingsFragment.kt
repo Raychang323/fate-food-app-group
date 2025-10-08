@@ -2,23 +2,27 @@ package com.fatefulsupper.app.ui.settings
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.fatefulsupper.app.R
 import com.fatefulsupper.app.ui.dialog.NotificationSettingsDialog
 import com.fatefulsupper.app.ui.dialog.SupperBlacklistDialog
+import com.fatefulsupper.app.util.TokenManager
 
 class SettingsFragment : PreferenceFragmentCompat(),
     NotificationSettingsDialog.NotificationDialogListener,
     SupperBlacklistDialog.SupperBlacklistDialogListener {
 
     private lateinit var settingsViewModel: SettingsViewModel
+    private lateinit var tokenManager: TokenManager
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
 
         settingsViewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
+        tokenManager = TokenManager(requireContext())
 
         val notificationSettingsPref: Preference? = findPreference("pref_notification_settings")
         notificationSettingsPref?.setOnPreferenceClickListener {
@@ -43,9 +47,14 @@ class SettingsFragment : PreferenceFragmentCompat(),
         Log.d(TAG, "Notification setup skipped. Was first time setup: $isFirstTimeSetupContext")
     }
 
-    override fun onBlacklistSettingsSaved(blacklistedIds: Set<String>) {
+    override fun onBlacklistSettingsSaved(blacklistedIds: Set<Int>) { // Changed type to Set<Int>
         Log.d(TAG, "Supper blacklist settings saved with IDs: $blacklistedIds")
-        val userId = "test_user_id" // TODO: Replace with actual user ID
+        val userId = tokenManager.getUserId()
+        if (userId == null) {
+            Log.e(TAG, "User ID not found when saving blacklist settings.")
+            Toast.makeText(requireContext(), "User not logged in. Cannot save blacklist.", Toast.LENGTH_SHORT).show()
+            return
+        }
         settingsViewModel.updateNightSnackBlacklist(userId, blacklistedIds)
     }
 

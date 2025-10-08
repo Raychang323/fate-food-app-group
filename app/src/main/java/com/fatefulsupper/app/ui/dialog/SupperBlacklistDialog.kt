@@ -16,7 +16,7 @@ import com.fatefulsupper.app.util.SetupConstants
 class SupperBlacklistDialog : DialogFragment() {
 
     interface SupperBlacklistDialogListener {
-        fun onBlacklistSettingsSaved(blacklistedTypes: Set<String>)
+        fun onBlacklistSettingsSaved(blacklistedIds: Set<Int>)
         fun onBlacklistSetupSkipped()
     }
 
@@ -28,7 +28,8 @@ class SupperBlacklistDialog : DialogFragment() {
     private lateinit var buttonSkip: Button
 
     private lateinit var sharedPreferences: SharedPreferences
-    private val dynamicallyCreatedCheckBoxes = mutableMapOf<String, CheckBox>()
+    private val dynamicallyCreatedCheckBoxes = mutableMapOf<Int, CheckBox>() // Changed to Int key
+    private val supperTypeMap = SetupConstants.SUPPER_TYPES_BLACKLIST_OPTIONS.associateBy { it.typeKey }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -65,11 +66,11 @@ class SupperBlacklistDialog : DialogFragment() {
         buttonSkip.text = if (isFirstTimeSetup) getString(R.string.button_skip_step) else getString(R.string.button_cancel)
 
         buttonSave.setOnClickListener {
-            val selectedTypes = saveBlacklist()
+            val selectedIds = saveBlacklist()
             if (isFirstTimeSetup) {
                 markSetupAsFullyCompleted()
             }
-            listener?.onBlacklistSettingsSaved(selectedTypes)
+            listener?.onBlacklistSettingsSaved(selectedIds)
             dismiss()
         }
 
@@ -86,42 +87,51 @@ class SupperBlacklistDialog : DialogFragment() {
         checkboxContainer.removeAllViews()
         dynamicallyCreatedCheckBoxes.clear()
 
-        SetupConstants.SUPPER_TYPES_BLACKLIST_OPTIONS.forEach { (displayName, typeKey) ->
+        SetupConstants.SUPPER_TYPES_BLACKLIST_OPTIONS.forEach { supperType ->
             val checkBox = CheckBox(context).apply {
-                text = displayName
-                tag = typeKey
+                text = supperType.displayName
+                tag = supperType.id // Use ID as tag
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
             }
             checkboxContainer.addView(checkBox)
-            dynamicallyCreatedCheckBoxes[typeKey] = checkBox
+            dynamicallyCreatedCheckBoxes[supperType.id] = checkBox // Store by ID
         }
     }
 
     private fun loadCurrentBlacklist() {
-        val blacklistedTypes = sharedPreferences.getStringSet(
+        // Blacklisted types are stored as typeKey strings in SharedPreferences
+        val blacklistedTypeKeys = sharedPreferences.getStringSet(
             SetupConstants.KEY_BLACKLISTED_SUPPER_TYPES, emptySet()
         ) ?: emptySet()
 
-        blacklistedTypes.forEach { typeKey ->
-            dynamicallyCreatedCheckBoxes[typeKey]?.isChecked = true
+        // Convert typeKeys back to IDs to check checkboxes
+        val blacklistedIds = blacklistedTypeKeys.mapNotNull { supperTypeMap[it]?.id }.toSet()
+
+        blacklistedIds.forEach { id ->
+            dynamicallyCreatedCheckBoxes[id]?.isChecked = true
         }
     }
 
-    private fun saveBlacklist(): Set<String> {
-        val selectedBlacklistedTypes = mutableSetOf<String>()
-        dynamicallyCreatedCheckBoxes.forEach { (typeKey, checkBox) ->
+    private fun saveBlacklist(): Set<Int> {
+        val selectedBlacklistedIds = mutableSetOf<Int>()
+        val selectedBlacklistedTypeKeys = mutableSetOf<String>()
+
+        dynamicallyCreatedCheckBoxes.forEach { (id, checkBox) ->
             if (checkBox.isChecked) {
-                selectedBlacklistedTypes.add(typeKey)
+                selectedBlacklistedIds.add(id)
+                // Also save typeKeys to SharedPreferences for backward compatibility or display
+                val supperType = SetupConstants.SUPPER_TYPES_BLACKLIST_OPTIONS.find { it.id == id }
+                supperType?.typeKey?.let { selectedBlacklistedTypeKeys.add(it) }
             }
         }
         with(sharedPreferences.edit()) {
-            putStringSet(SetupConstants.KEY_BLACKLISTED_SUPPER_TYPES, selectedBlacklistedTypes)
+            putStringSet(SetupConstants.KEY_BLACKLISTED_SUPPER_TYPES, selectedBlacklistedTypeKeys)
             apply()
         }
-        return selectedBlacklistedTypes
+        return selectedBlacklistedIds
     }
 
     private fun markSetupAsFullyCompleted() {

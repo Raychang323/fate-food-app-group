@@ -57,11 +57,11 @@ class LazyModeViewModel(application: Application) : AndroidViewModel(application
     private val userFoodTypePreferences = mutableListOf<Pair<String, Boolean>>()
 
     internal val masterFoodItemsList: List<MasterFoodItem> =
-        SetupConstants.SUPPER_TYPES_BLACKLIST_OPTIONS.map { (displayName, typeKey) ->
+        SetupConstants.SUPPER_TYPES_BLACKLIST_OPTIONS.map { supperType ->
             MasterFoodItem(
-                id = typeKey,
-                name = displayName,
-                description = "宵夜精選：$displayName",
+                id = supperType.typeKey,
+                name = supperType.displayName,
+                description = "宵夜精選：${supperType.displayName}",
                 imageResId = R.drawable.ic_placeholder_generic_food
             )
         }
